@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>声纹分析系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>声纹分析系统</h1>
+        
+        <div class="controls">
+            <button id="recordBtn">开始录音</button>
+            <div class="upload-btn-wrapper">
+                <button id="uploadBtn">上传音频</button>
+                <input type="file" id="audioFile" accept="audio/*">
+            </div>
+        </div>
+
+        <div class="playback-controls">
+            <button id="playPauseBtn" disabled>播放</button>
+            <div class="progress-container">
+                <input type="range" id="progressBar" min="0" max="100" value="0" disabled>
+                <div class="time-display">
+                    <span id="currentTime">00:00</span> / 
+                    <span id="totalTime">00:00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="visualization">
+            <div class="visual-container">
+                <h3>波形图</h3>
+                <canvas id="waveform"></canvas>
+            </div>
+            <div class="visual-container">
+                <h3>频谱图</h3>
+                <canvas id="spectrogram"></canvas>
+            </div>
+        </div>
+
+        <div class="features">
+            <h3>声纹特征分析</h3>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <span>音量(dB):</span>
+                    <span id="volume">0</span>
+                </div>
+                <div class="feature-item">
+                    <span>主频率(Hz):</span>
+                    <span id="pitch">0</span>
+                </div>
+                <div class="feature-item">
+                    <span>音色丰富度:</span>
+                    <span id="timbre">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="status">
+            <p id="statusText">等待输入...</p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
