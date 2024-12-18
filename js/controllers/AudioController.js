@@ -25,24 +25,7 @@ export class AudioController {
         this.playPauseBtn.addEventListener('click', () => this.togglePlayback());
         this.progressBar.addEventListener('input', () => this.seekAudio());
         this.progressBar.addEventListener('change', () => this.seekAudio());
-        
-        // 添加文件上传监听
         this.audioFileInput.addEventListener('change', (e) => this.handleFileUpload(e));
-    }
-
-    // 添加文件上传处理方法
-    handleFileUpload(event) {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.loadAudioFile(e.target.result);
-            };
-            reader.readAsArrayBuffer(file);
-            
-            // 更新状态文本
-            document.getElementById('statusText').textContent = '正在加载音频文件...';
-        }
     }
 
     resetState() {
@@ -51,6 +34,18 @@ export class AudioController {
         this.startTime = 0;
         this.pauseTime = 0;
         this.isPlaying = false;
+    }
+
+    handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.loadAudioFile(e.target.result);
+            };
+            reader.readAsArrayBuffer(file);
+            document.getElementById('statusText').textContent = '正在加载音频文件...';
+        }
     }
 
     loadAudioFile(arrayBuffer) {
@@ -95,7 +90,10 @@ export class AudioController {
 
             this.audioSource = this.audioContext.createBufferSource();
             this.audioSource.buffer = this.audioBuffer;
+            
+            // 连接到分析器和输出
             this.audioSource.connect(this.audioAnalyzer.analyser);
+            this.audioSource.connect(this.audioAnalyzer.waveAnalyser);
             this.audioSource.connect(this.audioContext.destination);
 
             this.startTime = this.audioContext.currentTime - this.pauseTime;

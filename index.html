@@ -38,31 +38,46 @@
             <div class="visual-container">
                 <h3>波形图</h3>
                 <canvas id="waveform"></canvas>
+                <div class="analysis-data">
+                    <h4>时域分析</h4>
+                    <div class="data-grid">
+                        <div class="data-item">
+                            <span>有效音长:</span>
+                            <span id="effectiveDuration">0.00 s</span>
+                        </div>
+                        <div class="data-item">
+                            <span>过零率:</span>
+                            <span id="zeroCrossRate">0 Hz</span>
+                        </div>
+                        <div class="data-item">
+                            <span>平均能量:</span>
+                            <span id="averageEnergy">0 dB</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="visual-container">
                 <h3>频谱图</h3>
                 <canvas id="spectrogram"></canvas>
+                <div class="analysis-data">
+                    <h4>频域分析</h4>
+                    <div class="data-grid">
+                        <div class="data-item">
+                            <span>基频(F0):</span>
+                            <span id="fundamentalFreq">0 Hz</span>
+                        </div>
+                        <div class="data-item">
+                            <span>谐波数:</span>
+                            <span id="harmonicsCount">0</span>
+                        </div>
+                        <div class="data-item">
+                            <span>频谱质心:</span>
+                            <span id="spectralCentroid">0 Hz</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="features">
-            <h3>声纹特征分析</h3>
-            <div class="feature-grid">
-                <div class="feature-item">
-                    <span>音量(dB):</span>
-                    <span id="volume">0</span>
-                </div>
-                <div class="feature-item">
-                    <span>主频率(Hz):</span>
-                    <span id="pitch">0</span>
-                </div>
-                <div class="feature-item">
-                    <span>音色丰富度:</span>
-                    <span id="timbre">0</span>
-                </div>
-            </div>
-        </div>
-
     </div>
 </body>
 </html> 

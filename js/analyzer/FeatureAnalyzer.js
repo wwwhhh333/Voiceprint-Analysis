@@ -12,40 +12,131 @@ export class FeatureAnalyzer {
         if (now - this.lastUpdate > this.updateInterval) {
             this.lastUpdate = now;
             
+            const timeData = this.audioAnalyzer.getWaveformData();
             const freqData = this.audioAnalyzer.getFrequencyData();
-            this.updateFeatures(freqData);
+            
+            this.updateTimeAnalysis(timeData);
+            this.updateFrequencyAnalysis(freqData);
         }
     }
 
-    updateFeatures(freqData) {
-        const bufferLength = freqData.length;
+    updateTimeAnalysis(timeData) {
+        // 计算有效音长
+        const effectiveDuration = this.calculateEffectiveDuration(timeData);
+        document.getElementById('effectiveDuration').textContent = 
+            `${effectiveDuration.toFixed(2)} s`;
         
-        // 计算音量
-        const average = freqData.reduce((a, b) => a + b) / bufferLength;
-        document.getElementById('volume').textContent = 
-            Math.round(average * 100 / 256) + '%';
+        // 计算过零率
+        const zcr = this.calculateZeroCrossingRate(timeData);
+        document.getElementById('zeroCrossRate').textContent = 
+            `${Math.round(zcr)} Hz`;
         
-        // 计算主频率
-        const maxIndex = this.findMaxFrequencyIndex(freqData);
-        const dominantFrequency = maxIndex * this.audioAnalyzer.audioContext.sampleRate / 
-            (this.audioAnalyzer.analyser.fftSize * 2);
-        document.getElementById('pitch').textContent = 
-            Math.round(dominantFrequency) + 'Hz';
-        
-        // 计算音色丰富��
-        const timbreRichness = this.calculateTimbreRichness(freqData, average);
-        document.getElementById('timbre').textContent = 
-            Math.round(timbreRichness) + '%';
+        // 计算平均能量
+        const energy = this.calculateAverageEnergy(timeData);
+        document.getElementById('averageEnergy').textContent = 
+            `${energy.toFixed(1)} dB`;
     }
 
-    findMaxFrequencyIndex(freqData) {
-        return freqData.reduce((maxIndex, value, index, arr) => 
-            value > arr[maxIndex] ? index : maxIndex, 0);
+    updateFrequencyAnalysis(freqData) {
+        // 计算基频
+        const f0 = this.detectFundamentalFrequency(freqData);
+        document.getElementById('fundamentalFreq').textContent = 
+            `${Math.round(f0)} Hz`;
+        
+        // 计算谐波数
+        const harmonics = this.detectHarmonics(freqData, f0);
+        document.getElementById('harmonicsCount').textContent = 
+            harmonics.length.toString();
+        
+        // 计算频谱质心
+        const centroid = this.calculateSpectralCentroid(freqData);
+        document.getElementById('spectralCentroid').textContent = 
+            `${Math.round(centroid)} Hz`;
     }
 
-    calculateTimbreRichness(freqData, mean) {
-        const variance = freqData.reduce((acc, val) => 
-            acc + Math.pow(val - mean, 2), 0) / freqData.length;
-        return Math.sqrt(variance) / 128 * 100;
+    calculateEffectiveDuration(timeData) {
+        const threshold = 0.01;
+        let effectiveSamples = 0;
+        
+        timeData.forEach(sample => {
+            if (Math.abs(sample) > threshold) {
+                effectiveSamples++;
+            }
+        });
+        
+        return effectiveSamples / this.audioAnalyzer.audioContext.sampleRate;
+    }
+
+    calculateZeroCrossingRate(timeData) {
+        let crossings = 0;
+        for (let i = 1; i < timeData.length; i++) {
+            if ((timeData[i] * timeData[i - 1]) < 0) {
+                crossings++;
+            }
+        }
+        return (crossings * this.audioAnalyzer.audioContext.sampleRate) / 
+            (2 * timeData.length);
+    }
+
+    calculateAverageEnergy(timeData) {
+        const rms = Math.sqrt(timeData.reduce((acc, val) => 
+            acc + val * val, 0) / timeData.length);
+        return 20 * Math.log10(rms);
+    }
+
+    detectFundamentalFrequency(freqData) {
+        const sampleRate = this.audioAnalyzer.audioContext.sampleRate;
+        const binSize = sampleRate / (2 * freqData.length);
+        let maxValue = -Infinity;
+        let maxIndex = 0;
+        
+        // 在20Hz-2000Hz范围内寻找基频
+        const minBin = Math.floor(20 / binSize);
+        const maxBin = Math.floor(2000 / binSize);
+        
+        for (let i = minBin; i < maxBin; i++) {
+            if (freqData[i] > maxValue) {
+                maxValue = freqData[i];
+                maxIndex = i;
+            }
+        }
+        
+        return maxIndex * binSize;
+    }
+
+    detectHarmonics(freqData, f0) {
+        const harmonics = [];
+        const sampleRate = this.audioAnalyzer.audioContext.sampleRate;
+        const binSize = sampleRate / (2 * freqData.length);
+        
+        // 检测前8个谐波
+        for (let i = 1; i <= 8; i++) {
+            const targetFreq = f0 * i;
+            const binIndex = Math.round(targetFreq / binSize);
+            
+            if (binIndex < freqData.length && freqData[binIndex] > -50) {
+                harmonics.push({
+                    frequency: targetFreq,
+                    magnitude: freqData[binIndex]
+                });
+            }
+        }
+        
+        return harmonics;
+    }
+
+    calculateSpectralCentroid(freqData) {
+        const sampleRate = this.audioAnalyzer.audioContext.sampleRate;
+        let weightedSum = 0;
+        let totalEnergy = 0;
+        
+        freqData.forEach((magnitude, i) => {
+            const frequency = i * sampleRate / (2 * freqData.length);
+            const energy = Math.pow(10, magnitude / 20);
+            weightedSum += frequency * energy;
+            totalEnergy += energy;
+        });
+        
+        return weightedSum / totalEnergy;
     }
 } 
