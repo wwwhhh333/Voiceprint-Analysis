@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>声纹分析系统</title>
     <link rel="stylesheet" href="style.css">
+    <script type="module" src="js/main.js"></script>
 </head>
 <body>
     <div class="container">
@@ -16,6 +17,10 @@
                 <button id="uploadBtn">上传音频</button>
                 <input type="file" id="audioFile" accept="audio/*">
             </div>
+        </div>
+
+        <div class="status">
+            <p id="statusText">等待输入...</p>
         </div>
 
         <div class="playback-controls">
@@ -58,10 +63,6 @@
             </div>
         </div>
 
-        <div class="status">
-            <p id="statusText">等待输入...</p>
-        </div>
     </div>
-    <script src="script.js"></script>
 </body>
 </html> 

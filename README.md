@@ -1,22 +1,15 @@
-# 网页版声纹分析系统
+# 声纹分析系统
 
-这是一个简单的网页版声纹分析系统，可以实时分析和可视化音频的声纹特征。
-
-## 功能特点
-- 支持录音和音频文件上传
-- 实时声纹频谱分析
-- 可视化频谱展示
-- 支持暂停/继续分析
-
-## 使用方法
-1. 打开网页后，可以选择：
-   - 点击"开始录音"进行实时录音
-   - 点击"上传音频"导入音频文件
-2. 系统会自动开始分析声纹并显示频谱图
-3. 可以随时暂停/继续分析
-4. 频谱图会显示声音的频率分布
-
-## 技术栈
-- HTML5 Web Audio API
-- Canvas 可视化
-- JavaScript ES6+ 
+## 项目结构
+/js
+├── analyzer/
+│   ├── AudioAnalyzer.js      # 音频分析核心类
+│   ├── FeatureAnalyzer.js    # 声纹特征分析
+│   └── Visualizer.js         # 可视化相关功能
+├── controllers/
+│   ├── AudioController.js    # 音频控制（播放、暂停等）
+│   └── RecordController.js   # 录音控制
+├── utils/
+│   ├── TimeFormatter.js      # 时间格式化工具
+│   └── AudioContext.js       # 音频上下文管理
+└── main.js                   # 主入口文件
