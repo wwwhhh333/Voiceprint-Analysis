@@ -5,21 +5,25 @@ export class CompareAnalyzer {
             timbreMatch: 0,
             featureMatch: 0
         };
-        // 设置分析的采样点数量上限
-        this.maxSamplePoints = 44100; // 1秒的采样数据
-    }
-
-    // 对音频数据进行降采样
-    downSampleBuffer(buffer) {
-        const rawData = buffer.getChannelData(0);
-        const sampleRate = Math.floor(rawData.length / this.maxSamplePoints) || 1;
-        const result = new Float32Array(Math.floor(rawData.length / sampleRate));
-        
-        for (let i = 0; i < result.length; i++) {
-            result[i] = rawData[i * sampleRate];
-        }
-        
-        return result;
+        this.maxSamplePoints = 88200; // 2秒的采样数据
+        this.fftSize = 2048;
+        this.hopSize = 256; // FFT帧移，减小以提高时间分辨率
+        this.offlineContext = new OfflineAudioContext(1, this.fftSize, 44100);
+        this.analyzer = this.offlineContext.createAnalyser();
+        this.analyzer.fftSize = this.fftSize;
+        this.weights = {
+            timbre: {
+                harmonicStructure: 0.35, // 谐波结构权重
+                spectralEnvelope: 0.35, // 频谱包络权重
+                brightness: 0.15, // 音色亮度权重
+                formants: 0.15  // 共振峰权重
+            },
+            voice: {
+                speechRate: 0.3,
+                pitchVariation: 0.4,
+                energyDistribution: 0.3
+            }
+        };
     }
 
     compare(audioBufferA, audioBufferB) {
@@ -29,76 +33,130 @@ export class CompareAnalyzer {
         const dataA = this.downSampleBuffer(audioBufferA);
         const dataB = this.downSampleBuffer(audioBufferB);
         
-        // 基本声纹特征对比
-        const similarity = this.calculateSimilarity(dataA, dataB);
-        
-        // 音色特征对比
-        const timbreMatch = this.calculateTimbreMatch(dataA, dataB);
-        
-        // 语音特征对比
-        const featureMatch = this.calculateFeatureMatch(dataA, dataB);
-
-        // 计算详细的对比指标
-        const details = {
-            // 基频相似度
-            pitchSimilarity: this.calculatePitchSimilarity(dataA, dataB),
-            // 音色特征
-            timbreFeatures: {
-                // 谐波结构相似度
+        try {
+            // 计算基础特征
+            const timbreFeatures = {
                 harmonicStructure: this.calculateHarmonicStructure(dataA, dataB),
-                // 频谱包络相似度
                 spectralEnvelope: this.calculateSpectralEnvelope(dataA, dataB),
-                // 音色亮度对比
                 brightness: this.calculateBrightness(dataA, dataB)
-            },
-            // 语音特征
-            voiceFeatures: {
-                // 语速相似度
+            };
+            
+            const voiceFeatures = {
                 speechRate: this.calculateSpeechRate(dataA, dataB),
-                // 音高变化特征
                 pitchVariation: this.calculatePitchVariation(dataA, dataB),
-                // 能量分布特征
                 energyDistribution: this.calculateEnergyDistribution(dataA, dataB)
+            };
+            
+            // 计算综合指标
+            const timbreMatch = 
+                this.weights.timbre.harmonicStructure * timbreFeatures.harmonicStructure +
+                this.weights.timbre.spectralEnvelope * timbreFeatures.spectralEnvelope +
+                this.weights.timbre.brightness * timbreFeatures.brightness;
+            
+            const featureMatch = 
+                this.weights.voice.speechRate * voiceFeatures.speechRate +
+                this.weights.voice.pitchVariation * voiceFeatures.pitchVariation +
+                this.weights.voice.energyDistribution * voiceFeatures.energyDistribution;
+            
+            // 计算总体相似度
+            const similarity = (timbreMatch + featureMatch) / 2;
+            
+            const details = {
+                timbreFeatures,
+                voiceFeatures
+            };
+
+            console.timeEnd('compareAudio');
+            console.log('分析结果:', {
+                similarity,
+                timbreMatch,
+                featureMatch,
+                details
+            });
+            return {
+                similarity,
+                timbreMatch,
+                featureMatch,
+                details
+            };
+        } catch (error) {
+            console.error('音频对比出错:', error);
+            return {
+                similarity: 0,
+                timbreMatch: 0,
+                featureMatch: 0,
+                details: {
+                    timbreFeatures: {
+                        harmonicStructure: 0,
+                        spectralEnvelope: 0,
+                        brightness: 0
+                    },
+                    voiceFeatures: {
+                        speechRate: 0,
+                        pitchVariation: 0,
+                        energyDistribution: 0
+                    }
+                }
+            };
+        }
+    }
+
+    // 计算谐波结构相似度
+    calculateHarmonicStructure(dataA, dataB) {
+        const harmonicsA = this.analyzeHarmonics(dataA);
+        const harmonicsB = this.analyzeHarmonics(dataB);
+        
+        const diff = this.calculateArrayDifference(harmonicsA, harmonicsB);
+        return 1 - Math.min(diff, 1);
+    }
+
+    // 分析谐波结构
+    analyzeHarmonics(data) {
+        // 应用汉宁窗
+        const windowedData = this.applyWindow(data);
+        
+        // 计算频谱
+        const spectrum = new Float32Array(this.fftSize / 2);
+        for (let i = 0; i < this.fftSize / 2; i++) {
+            let real = 0;
+            let imag = 0;
+            for (let j = 0; j < this.fftSize; j++) {
+                const angle = (2 * Math.PI * i * j) / this.fftSize;
+                real += windowedData[j] * Math.cos(angle);
+                imag -= windowedData[j] * Math.sin(angle);
             }
-        };
-
-        console.timeEnd('compareAudio');
-        return {
-            similarity,
-            timbreMatch,
-            featureMatch,
-            details
-        };
+            spectrum[i] = Math.sqrt(real * real + imag * imag);
+        }
+        
+        return spectrum;
     }
 
-    calculateSimilarity(dataA, dataB) {
-        // 计算能量差异
-        const energyA = this.calculateEnergy(dataA);
-        const energyB = this.calculateEnergy(dataB);
-        
-        // 归一化差异
-        const diff = Math.abs(energyA - energyB) / Math.max(energyA, energyB);
-        return 1 - diff;
+    // 应用汉宁窗
+    applyWindow(frame) {
+        const windowed = new Float32Array(frame.length);
+        for (let i = 0; i < frame.length; i++) {
+            const hannWindow = 0.5 * (1 - Math.cos(2 * Math.PI * i / (frame.length - 1)));
+            windowed[i] = frame[i] * hannWindow;
+        }
+        return windowed;
     }
 
-    calculateTimbreMatch(dataA, dataB) {
-        // 计算频谱质心差异
-        const centroidA = this.calculateSpectralCentroid(dataA);
-        const centroidB = this.calculateSpectralCentroid(dataB);
+    // 对音频数据进行降采样和预处理
+    downSampleBuffer(buffer) {
+        const rawData = buffer.getChannelData(0);
+        const sampleRate = Math.floor(rawData.length / this.maxSamplePoints) || 1;
+        const result = new Float32Array(Math.floor(rawData.length / sampleRate));
         
-        // 归一化差异
-        const diff = Math.abs(centroidA - centroidB) / Math.max(centroidA, centroidB);
-        return 1 - diff;
-    }
-
-    calculateFeatureMatch(dataA, dataB) {
-        // 计算过零率差异
-        const zcrA = this.calculateZeroCrossingRate(dataA);
-        const zcrB = this.calculateZeroCrossingRate(dataB);
+        for (let i = 0; i < result.length; i++) {
+            result[i] = rawData[i * sampleRate];
+        }
         
-        // 归一化差异
-        const diff = Math.abs(zcrA - zcrB) / Math.max(zcrA, zcrB);
-        return 1 - diff;
+        for (let i = 0; i < result.length; i++) {
+            const hannWindow = 0.5 * (1 - Math.cos(2 * Math.PI * i / (result.length - 1)));
+            result[i] *= hannWindow;
+        }
+        
+        return result;
     }
 
     calculateEnergy(data) {
@@ -132,17 +190,6 @@ export class CompareAnalyzer {
         const pitchB = this.estimatePitch(dataB);
         
         const diff = Math.abs(pitchA - pitchB) / Math.max(pitchA, pitchB);
-        return 1 - Math.min(diff, 1);
-    }
-
-    // 计算谐波结构相似度
-    calculateHarmonicStructure(dataA, dataB) {
-        // 使用FFT分析谐波结构
-        const harmonicsA = this.analyzeHarmonics(dataA);
-        const harmonicsB = this.analyzeHarmonics(dataB);
-        
-        // 计算谐波结构的相似度
-        const diff = this.calculateArrayDifference(harmonicsA, harmonicsB);
         return 1 - Math.min(diff, 1);
     }
 
@@ -209,17 +256,6 @@ export class CompareAnalyzer {
             correlations[lag] = correlation;
         }
         return this.findPeaks(correlations)[0] || 0;
-    }
-
-    // 辅助方法：分析谐波结构
-    analyzeHarmonics(data) {
-        const fftSize = 2048; // 使用固定的FFT大小
-        const fft = new Float32Array(fftSize);
-        // 简化的FFT计算
-        for (let i = 0; i < fftSize; i++) {
-            fft[i] = Math.abs(data[i % data.length]);
-        }
-        return fft;
     }
 
     // 辅助方法：计算包络

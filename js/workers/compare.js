@@ -1,8 +1,8 @@
-import { AudioAnalyzer } from './analyzer/AudioAnalyzer.js';
-import { AudioController } from './controllers/AudioController.js';
-import { CompareAnalyzer } from './analyzer/CompareAnalyzer.js';
-import { Visualizer } from './analyzer/Visualizer.js';
-import { RecordControllerPlus } from './controllers/RecordControllerPlus.js';
+import { AudioAnalyzer } from '../analyzer/AudioAnalyzer.js';
+import { AudioController } from '../controllers/AudioController.js';
+import { CompareAnalyzer } from '../analyzer/CompareAnalyzer.js';
+import { Visualizer } from '../analyzer/Visualizer.js';
+import { RecordControllerPlus } from '../controllers/RecordControllerPlus.js';
 
 class VoiceprintCompareSystem {
     constructor() {
@@ -168,7 +168,7 @@ class VoiceprintCompareSystem {
     }
 
     getConclusion(results) {
-        const averageMatch = (results.similarity + results.timbreMatch + results.featureMatch) / 3;
+        const averageMatch = results.similarity;
         const details = results.details;
         
         // 计算详细特征的平均匹配度
@@ -180,15 +180,78 @@ class VoiceprintCompareSystem {
                          details.voiceFeatures.pitchVariation + 
                          details.voiceFeatures.energyDistribution) / 3;
         
-        if (averageMatch > 0.8) {
-            return `极大可能是同一个人（音色匹配度: ${Math.round(timbreAvg * 100)}%，语音特征匹配度: ${Math.round(voiceAvg * 100)}%）`;
-        } else if (averageMatch > 0.6) {
-            return `可能是同一个人（音色匹配度: ${Math.round(timbreAvg * 100)}%，语音特征匹配度: ${Math.round(voiceAvg * 100)}%）`;
-        } else if (averageMatch > 0.4) {
-            return `相似度一般，难以判断（音色匹配度: ${Math.round(timbreAvg * 100)}%，语音特征匹配度: ${Math.round(voiceAvg * 100)}%）`;
-        } else {
-            return `可能不是同一个人（音色匹配度: ${Math.round(timbreAvg * 100)}%，语音特征匹配度: ${Math.round(voiceAvg * 100)}%）`;
+        // 分析具体特征的强弱项
+        const strengths = [];
+        const weaknesses = [];
+        
+        // 分析音色特征
+        if (details.timbreFeatures.harmonicStructure > 0.8) {
+            strengths.push('谐波结构高度相似');
+        } else if (details.timbreFeatures.harmonicStructure < 0.4) {
+            weaknesses.push('谐波结构差异较大');
         }
+        
+        if (details.timbreFeatures.spectralEnvelope > 0.8) {
+            strengths.push('频谱包络特征匹配');
+        } else if (details.timbreFeatures.spectralEnvelope < 0.4) {
+            weaknesses.push('频谱包络特征差异明显');
+        }
+        
+        // 分析语音特征
+        if (details.voiceFeatures.speechRate > 0.8) {
+            strengths.push('语速特征高度一致');
+        } else if (details.voiceFeatures.speechRate < 0.4) {
+            weaknesses.push('语速差异较大');
+        }
+        
+        if (details.voiceFeatures.pitchVariation > 0.8) {
+            strengths.push('音高变化模式相似');
+        } else if (details.voiceFeatures.pitchVariation < 0.4) {
+            weaknesses.push('音高变化模式差异明显');
+        }
+        
+        // 生成结论文本
+        let conclusion = '';
+        
+        if (averageMatch > 0.8) {
+            conclusion = `极大可能是同一个人（置信度：${Math.round(averageMatch * 100)}%）\n`;
+            conclusion += `\n主要判断依据：\n`;
+            conclusion += `• 音色特征匹配度：${Math.round(timbreAvg * 100)}%\n`;
+            conclusion += `• 语音特征匹配度：${Math.round(voiceAvg * 100)}%\n`;
+            if (strengths.length > 0) {
+                conclusion += `\n突出特征：\n• ${strengths.join('\n• ')}`;
+            }
+        } else if (averageMatch > 0.6) {
+            conclusion = `可能是同一个人（置信度：${Math.round(averageMatch * 100)}%）\n`;
+            conclusion += `\n分析结果：\n`;
+            conclusion += `• 音色特征匹配度：${Math.round(timbreAvg * 100)}%\n`;
+            conclusion += `• 语音特征匹配度：${Math.round(voiceAvg * 100)}%\n`;
+            if (strengths.length > 0) {
+                conclusion += `\n相似特征：\n• ${strengths.join('\n• ')}`;
+            }
+            if (weaknesses.length > 0) {
+                conclusion += `\n差异特征：\n• ${weaknesses.join('\n• ')}`;
+            }
+        } else if (averageMatch > 0.4) {
+            conclusion = `相似度一般，难以判断（置信度：${Math.round(averageMatch * 100)}%）\n`;
+            conclusion += `\n具体分析：\n`;
+            conclusion += `• 音色特征匹配度：${Math.round(timbreAvg * 100)}%\n`;
+            conclusion += `• 语音特征匹配度：${Math.round(voiceAvg * 100)}%\n`;
+            conclusion += `\n存在的差异：\n• ${weaknesses.join('\n• ')}`;
+            if (strengths.length > 0) {
+                conclusion += `\n相似之处：\n• ${strengths.join('\n• ')}`;
+            }
+        } else {
+            conclusion = `可能不是同一个人（置信度：${Math.round((1 - averageMatch) * 100)}%）\n`;
+            conclusion += `\n主要差异：\n`;
+            conclusion += `• 音色特征差异度：${Math.round((1 - timbreAvg) * 100)}%\n`;
+            conclusion += `• 语音特征差异度：${Math.round((1 - voiceAvg) * 100)}%\n`;
+            if (weaknesses.length > 0) {
+                conclusion += `\n具体差异：\n• ${weaknesses.join('\n• ')}`;
+            }
+        }
+        
+        return conclusion;
     }
 
     animateResults() {

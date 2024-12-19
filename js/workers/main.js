@@ -1,10 +1,10 @@
 //主文件，负责初始化应用
 
-import { AudioAnalyzer } from './analyzer/AudioAnalyzer.js';
-import { FeatureAnalyzer } from './analyzer/FeatureAnalyzer.js';
-import { Visualizer } from './analyzer/Visualizer.js';
-import { AudioController } from './controllers/AudioController.js';
-import { RecordController } from './controllers/RecordController.js';
+import { AudioAnalyzer } from '../analyzer/AudioAnalyzer.js';
+import { AudioController } from '../controllers/AudioController.js';
+import { FeatureAnalyzer } from '../analyzer/FeatureAnalyzer.js';
+import { Visualizer } from '../analyzer/Visualizer.js';
+import { RecordController } from '../controllers/RecordController.js';
 
 class VoiceprintAnalysisSystem {
     constructor() {

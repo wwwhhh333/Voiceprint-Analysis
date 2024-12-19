@@ -6,7 +6,7 @@
     <title>声纹对比 - 声纹分析系统</title>
     <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Patrick+Hand&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script type="module" src="js/compare.js"></script>
+    <script type="module" src="js/workers/compare.js"></script>
 </head>
 <body>
     <nav class="nav-bar">
@@ -121,7 +121,8 @@
                 </div>
             </div>
             <div class="conclusion">
-                <p>结论: <span id="comparisonConclusion">请上传两段音频进行对比</span></p>
+                <h4>分析结论</h4>
+                <pre id="comparisonConclusion" class="conclusion-text">请上传两段音频进行对比</pre>
             </div>
         </div>
     </div>
