@@ -91,29 +91,37 @@ export class RecordControllerPlus {
         if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
             this.mediaRecorder.stop();
             
-            // 停止波形可视化
             this.stopVisualization();
             
-            // 处理录音结束事件
             this.mediaRecorder.onstop = () => {
                 const blob = new Blob(this.recordedChunks, { type: 'audio/webm' });
                 this.recordedChunks = [];
                 
-                // 将录音数据转换为ArrayBuffer
                 blob.arrayBuffer().then(buffer => {
-                    // 触发录音完成事件
-                    const event = new CustomEvent('recordingComplete', {
-                        detail: { buffer, suffix: this.suffix }
-                    });
-                    document.dispatchEvent(event);
+                    console.log('录音完成，开始解码...');
+                    // 直接解码音频数据
+                    this.audioContext.decodeAudioData(buffer, 
+                        (audioBuffer) => {
+                            console.log('录音解码成功，触发完成事件');
+                            const event = new CustomEvent('recordingComplete', {
+                                detail: { 
+                                    audioBuffer,
+                                    suffix: this.suffix 
+                                }
+                            });
+                            document.dispatchEvent(event);
+                        },
+                        (error) => {
+                            console.error('解码录音失败:', error);
+                            alert('录音处理失败');
+                        }
+                    );
                 });
             };
             
-            // 停止所有音轨
             this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
             this.isRecording = false;
             
-            // 更新UI
             this.recordButton.textContent = '开始录音';
             this.recordButton.classList.remove('recording');
         }

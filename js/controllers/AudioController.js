@@ -178,6 +178,37 @@ export class AudioController {
     }
 
     setAudioBuffer(buffer) {
+        console.log(`设置音频缓冲区 ${this.suffix}:`, buffer);
         this.audioBuffer = buffer;
+        this.isPlaying = false;
+        this.startTime = 0;
+        this.pauseTime = 0;
+        
+        if (this.playPauseBtn) {
+            this.playPauseBtn.textContent = '播放';
+            this.playPauseBtn.disabled = false;
+        }
+        if (this.progressBar) {
+            this.progressBar.value = 0;
+            this.progressBar.disabled = false;
+        }
+    }
+
+    enablePlaybackControls() {
+        console.log(`启用播放控制 ${this.suffix}`);
+        if (this.playPauseBtn) {
+            this.playPauseBtn.disabled = false;
+        }
+        if (this.progressBar) {
+            this.progressBar.disabled = false;
+        }
+    }
+
+    updateTotalTime(duration) {
+        console.log(`更新总时长 ${this.suffix}:`, duration);
+        if (this.totalTimeSpan) {
+            this.totalTimeSpan.textContent = TimeFormatter.formatTime(duration);
+            this.progressBar.max = Math.floor(duration);
+        }
     }
 } 

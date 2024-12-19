@@ -23,10 +23,10 @@
                 <h3>音频 A</h3>
                 <div class="input-controls">
                     <button id="recordBtnA" class="record-btn">开始录音</button>
-                    <label class="upload-btn">
+                    <div class="upload-btn-wrapper">
+                        <button class="upload-btn">上传音频 A</button>
                         <input type="file" id="audioFileA" accept="audio/*">
-                        <span>上传音频 A</span>
-                    </label>
+                    </div>
                 </div>
                 <div class="playback-controls">
                     <button id="playPauseBtnA" disabled>播放</button>
@@ -47,10 +47,10 @@
                 <h3>音频 B</h3>
                 <div class="input-controls">
                     <button id="recordBtnB" class="record-btn">开始录音</button>
-                    <label class="upload-btn">
+                    <div class="upload-btn-wrapper">
+                        <button class="upload-btn">上传音频 B</button>
                         <input type="file" id="audioFileB" accept="audio/*">
-                        <span>上传音频 B</span>
-                    </label>
+                    </div>
                 </div>
                 <div class="playback-controls">
                     <button id="playPauseBtnB" disabled>播放</button>
@@ -82,6 +82,42 @@
                 <div class="result-item">
                     <span>语音特征匹配:</span>
                     <span id="featureMatch">0%</span>
+                </div>
+            </div>
+            <div class="detailed-results">
+                <div class="result-section">
+                    <h4>音色特征对比</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span>谐波结构:</span>
+                            <span id="harmonicStructure">0%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>频谱包络:</span>
+                            <span id="spectralEnvelope">0%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>音色亮度:</span>
+                            <span id="brightness">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="result-section">
+                    <h4>语音特征对比</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span>语速相似度:</span>
+                            <span id="speechRate">0%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>音高变化:</span>
+                            <span id="pitchVariation">0%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>能量分布:</span>
+                            <span id="energyDistribution">0%</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="conclusion">
