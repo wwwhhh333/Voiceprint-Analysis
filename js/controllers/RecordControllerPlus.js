@@ -1,15 +1,14 @@
-//录音控制器，负责录音的开始、停止、保存等操作
-
 import { getAudioContext } from '../utils/AudioContext.js';
 
-export class RecordController {
-    constructor(audioAnalyzer) {
+export class RecordControllerPlus {
+    constructor(audioAnalyzer, suffix = '') {
         this.audioAnalyzer = audioAnalyzer;
         this.audioContext = getAudioContext();
+        this.suffix = suffix;
         this.isRecording = false;
         this.mediaRecorder = null;
         this.recordedChunks = [];
-        this.recordButton = document.getElementById('recordBtn');
+        this.recordButton = document.getElementById(`recordBtn${suffix}`);
         this.visualizer = null;
         
         if (this.recordButton) {
@@ -48,11 +47,14 @@ export class RecordController {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             
+            // 创建MediaRecorder
             this.mediaRecorder = new MediaRecorder(stream);
             
+            // 创建音频源并连接到分析器
             const source = this.audioContext.createMediaStreamSource(stream);
             this.audioAnalyzer.connectSource(source);
             
+            // 设置录音数据处理
             this.recordedChunks = [];
             this.mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
@@ -60,12 +62,15 @@ export class RecordController {
                 }
             };
 
+            // 开始录音
             this.mediaRecorder.start();
             this.isRecording = true;
             
+            // 更新UI
             this.recordButton.textContent = '停止录音';
             this.recordButton.classList.add('recording');
             
+            // 开始波形可视化
             this.startVisualization();
             
         } catch (err) {
@@ -86,32 +91,29 @@ export class RecordController {
         if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
             this.mediaRecorder.stop();
             
+            // 停止波形可视化
             this.stopVisualization();
             
+            // 处理录音结束事件
             this.mediaRecorder.onstop = () => {
                 const blob = new Blob(this.recordedChunks, { type: 'audio/webm' });
                 this.recordedChunks = [];
                 
+                // 将录音数据转换为ArrayBuffer
                 blob.arrayBuffer().then(buffer => {
-                    // 直接解码音频数据
-                    this.audioContext.decodeAudioData(buffer, 
-                        (audioBuffer) => {
-                            const event = new CustomEvent('recordingComplete', {
-                                detail: { audioBuffer }
-                            });
-                            document.dispatchEvent(event);
-                        },
-                        (error) => {
-                            console.error('解码录音失败:', error);
-                            document.getElementById('statusText').textContent = '录音处理失败';
-                        }
-                    );
+                    // 触发录音完成事件
+                    const event = new CustomEvent('recordingComplete', {
+                        detail: { buffer, suffix: this.suffix }
+                    });
+                    document.dispatchEvent(event);
                 });
             };
             
+            // 停止所有音轨
             this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
             this.isRecording = false;
             
+            // 更新UI
             this.recordButton.textContent = '开始录音';
             this.recordButton.classList.remove('recording');
         }

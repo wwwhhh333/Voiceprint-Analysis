@@ -4,28 +4,36 @@ import { TimeFormatter } from '../utils/TimeFormatter.js';
 import { getAudioContext } from '../utils/AudioContext.js';
 
 export class AudioController {
-    constructor(audioAnalyzer) {
+    constructor(audioAnalyzer, suffix = '') {
         this.audioAnalyzer = audioAnalyzer;
         this.audioContext = getAudioContext();
+        this.suffix = suffix; // 用于区分A/B音频
         this.setupControls();
         this.resetState();
     }
 
     setupControls() {
-        this.playPauseBtn = document.getElementById('playPauseBtn');
-        this.progressBar = document.getElementById('progressBar');
-        this.currentTimeSpan = document.getElementById('currentTime');
-        this.totalTimeSpan = document.getElementById('totalTime');
-        this.audioFileInput = document.getElementById('audioFile');
+        // 根据suffix获取对应的控制元素
+        this.playPauseBtn = document.getElementById(`playPauseBtn${this.suffix}`);
+        this.progressBar = document.getElementById(`progressBar${this.suffix}`);
+        this.currentTimeSpan = document.getElementById(`currentTime${this.suffix}`);
+        this.totalTimeSpan = document.getElementById(`totalTime${this.suffix}`);
+        this.audioFileInput = document.getElementById(`audioFile${this.suffix}`);
         
-        this.setupEventListeners();
+        if (this.playPauseBtn) {
+            this.setupEventListeners();
+        }
     }
 
     setupEventListeners() {
         this.playPauseBtn.addEventListener('click', () => this.togglePlayback());
         this.progressBar.addEventListener('input', () => this.seekAudio());
         this.progressBar.addEventListener('change', () => this.seekAudio());
-        this.audioFileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+        
+        // 只在主页面添加文件上传监听
+        if (!this.suffix && this.audioFileInput) {
+            this.audioFileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+        }
     }
 
     resetState() {
@@ -44,7 +52,10 @@ export class AudioController {
                 this.loadAudioFile(e.target.result);
             };
             reader.readAsArrayBuffer(file);
-            document.getElementById('statusText').textContent = '正在加载音频文件...';
+            const statusText = document.getElementById('statusText');
+            if (statusText) {
+                statusText.textContent = '正在加载音频文件...';
+            }
         }
     }
 
@@ -54,24 +65,34 @@ export class AudioController {
                 this.audioBuffer = buffer;
                 this.enablePlaybackControls();
                 this.updateTotalTime(buffer.duration);
-                this.startPlayback();
-                document.getElementById('statusText').textContent = '音频文件已加载';
+                
+                const statusText = document.getElementById('statusText');
+                if (statusText) {
+                    statusText.textContent = '音频文件已加载';
+                }
             },
             (error) => {
                 console.error('解码音频文件失败:', error);
-                document.getElementById('statusText').textContent = '音频文件加载失败';
+                const statusText = document.getElementById('statusText');
+                if (statusText) {
+                    statusText.textContent = '音频文件加载失败';
+                }
             }
         );
     }
 
     enablePlaybackControls() {
-        this.playPauseBtn.disabled = false;
-        this.progressBar.disabled = false;
+        if (this.playPauseBtn) {
+            this.playPauseBtn.disabled = false;
+            this.progressBar.disabled = false;
+        }
     }
 
     updateTotalTime(duration) {
-        this.totalTimeSpan.textContent = TimeFormatter.formatTime(duration);
-        this.progressBar.max = Math.floor(duration);
+        if (this.totalTimeSpan) {
+            this.totalTimeSpan.textContent = TimeFormatter.formatTime(duration);
+            this.progressBar.max = Math.floor(duration);
+        }
     }
 
     togglePlayback() {
@@ -99,7 +120,10 @@ export class AudioController {
             this.startTime = this.audioContext.currentTime - this.pauseTime;
             this.audioSource.start(0, this.pauseTime);
             this.isPlaying = true;
-            this.playPauseBtn.textContent = '暂停';
+            
+            if (this.playPauseBtn) {
+                this.playPauseBtn.textContent = '暂停';
+            }
 
             this.updatePlaybackProgress();
         }
@@ -110,13 +134,15 @@ export class AudioController {
             this.audioSource.stop();
             this.pauseTime = this.audioContext.currentTime - this.startTime;
             this.isPlaying = false;
-            this.playPauseBtn.textContent = '播放';
+            if (this.playPauseBtn) {
+                this.playPauseBtn.textContent = '播放';
+            }
         }
     }
 
     seekAudio() {
-        const seekTime = parseFloat(this.progressBar.value);
-        if (this.audioBuffer) {
+        if (this.audioBuffer && this.progressBar) {
+            const seekTime = parseFloat(this.progressBar.value);
             const wasPlaying = this.isPlaying;
             if (wasPlaying) {
                 this.pausePlayback();
@@ -125,13 +151,15 @@ export class AudioController {
             if (wasPlaying) {
                 this.startPlayback();
             }
-            this.currentTimeSpan.textContent = TimeFormatter.formatTime(seekTime);
+            if (this.currentTimeSpan) {
+                this.currentTimeSpan.textContent = TimeFormatter.formatTime(seekTime);
+            }
         }
     }
 
     updatePlaybackProgress() {
         const updateProgress = () => {
-            if (this.isPlaying) {
+            if (this.isPlaying && this.progressBar && this.currentTimeSpan) {
                 const currentTime = this.audioContext.currentTime - this.startTime;
                 if (currentTime <= this.audioBuffer.duration) {
                     this.progressBar.value = currentTime;
@@ -140,10 +168,16 @@ export class AudioController {
                 } else {
                     this.isPlaying = false;
                     this.pauseTime = 0;
-                    this.playPauseBtn.textContent = '播放';
+                    if (this.playPauseBtn) {
+                        this.playPauseBtn.textContent = '播放';
+                    }
                 }
             }
         };
         requestAnimationFrame(updateProgress);
+    }
+
+    setAudioBuffer(buffer) {
+        this.audioBuffer = buffer;
     }
 } 
