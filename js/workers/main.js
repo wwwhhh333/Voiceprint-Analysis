@@ -49,4 +49,52 @@ class VoiceprintAnalysisSystem {
 // 初始化应用
 window.addEventListener('load', () => {
     new VoiceprintAnalysisSystem();
-}); 
+});
+
+// 在页面加载完成后执行
+document.addEventListener('DOMContentLoaded', () => {
+    // 获取所有导航链接
+    const navLinks = document.querySelectorAll('.nav-item');
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            // 如果不是当前激活的链接
+            if (!link.classList.contains('active')) {
+                e.preventDefault();
+                
+                // 移除其他链接的激活状态
+                navLinks.forEach(l => l.classList.remove('active'));
+                
+                // 添加当前链接的激活状态
+                link.classList.add('active');
+                
+                // 获取目标页面URL
+                const targetUrl = link.getAttribute('href');
+                
+                // 添加退出动画
+                document.querySelector('.body-contianer').style.animation = 'slideOut 0.3s ease-out';
+                
+                // 等待动画完成后跳转
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 300);
+            }
+        });
+    });
+});
+
+// 添加退出动画的关键帧
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideOut {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+    }
+`;
+document.head.appendChild(style); 

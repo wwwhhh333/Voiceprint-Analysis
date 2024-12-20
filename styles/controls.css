@@ -1,0 +1,122 @@
+/* 按钮容器 */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 20px;
+}
+
+/* 声纹分析页面的按钮间距 */
+.body-contianer > .controls > #recordBtn {
+    margin-right: 20px;
+}
+
+/* 对比页面的按钮组 */
+.input-controls {
+    display: flex;
+    gap: 25px;
+    margin-right: auto;
+}
+
+/* 右侧播放控制组 */
+.playback-controls {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+/* 按钮基础样式 */
+#recordBtn, .upload-btn, #playPauseBtn, 
+#recordBtnA, #recordBtnB, 
+#playPauseBtnA, #playPauseBtnB {
+    border: none;
+    border-radius: 20px;
+    height: 45px;
+    width: 130px;
+    padding: 0;
+    margin-right: 0; /* 移除右边距，使用gap控制间距 */
+    
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--text-color);
+    background-color: var(--button-color); 
+    
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 上传按钮 */
+.upload-btn {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+}
+
+.upload-btn span {
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.upload-btn input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    font-size: 0;
+}
+
+/* 按钮状态 */
+#recordBtn:hover, .upload-btn:hover, #playPauseBtn:hover,
+#recordBtnA:hover, #recordBtnB:hover,
+#playPauseBtnA:hover, #playPauseBtnB:hover {
+    background-color: var(--button-hover-color);
+    color: #FFFFFF;
+    transform: translateY(-2px);
+}
+
+#recordBtn:disabled, .upload-btn:disabled, #playPauseBtn:disabled,
+#recordBtnA:disabled, #recordBtnB:disabled,
+#playPauseBtnA:disabled, #playPauseBtnB:disabled {
+    background-color: #CBD5E0; 
+    color: #A0AEC0;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 播放控制 */
+.playback-controls {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-left: auto;
+}
+
+.progress-container {
+    display: flex;
+    align-items: center;
+    min-width: 400px;
+}
+
+input[type="range"] {
+    flex: 1;
+    min-width: 300px;
+    margin: 0 15px;
+    height: 5px;
+}
+
+.time-display {
+    white-space: nowrap;
+    min-width: 100px;
+    text-align: right;
+    color: var(--text-color);
+    font-size: 16px;
+}

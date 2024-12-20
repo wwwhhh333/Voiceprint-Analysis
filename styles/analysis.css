@@ -1,0 +1,171 @@
+/* 可视化区域 */
+.visualization {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.visual-container {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 标题样式 */
+.visual-container h3 {
+    color: var(--text-color);
+    font-weight: 400;
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+.visual-container h4 {
+    color: var(--text-color);
+    font-weight: 400;
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+/* Canvas */
+canvas {
+    width: 100%;
+    height: 200px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: #FAFAFA;
+    transition: border-color 0.3s ease;
+}
+
+canvas:hover {
+    border-color: var(--button-hover-color);
+}
+
+/* 数据显示 */
+.analysis-data {
+    margin-top: 20px;
+    padding: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: #FAFAFA;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.data-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    flex: 1;
+}
+
+.data-item {
+    padding: 15px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    text-align: center;
+    background-color: white;
+    transition: all 0.3s ease;
+}
+
+.data-item:hover {
+    border-color: var(--button-hover-color);
+    transform: translateY(-2px);
+}
+
+/* 对比页面布局 */
+.compare-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+/* 音频面板布局优化 */
+.audio-panel {
+    flex: 1;
+    min-width: 400px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    background-color: white;
+    box-sizing: border-box;
+}
+
+.audio-panel h3 {
+    margin-bottom: 20px;
+    color: var(--text-color);
+    font-weight: 400;
+    font-size: 20px;
+}
+
+/* 音频面板内部控件布局优化 */
+.audio-panel .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0;
+    margin-bottom: 25px;
+}
+
+/* 输入控件组 */
+.audio-panel .input-controls {
+    display: flex;
+    gap: 15px;
+}
+
+/* 播放控件组 */
+.audio-panel .playback-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+/* 进度条容器 */
+.audio-panel .progress-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 200px;
+}
+
+/* 进度条 */
+.audio-panel input[type="range"] {
+    flex: 1;
+    min-width: 150px;
+    max-width: none;
+    margin: 0 10px;
+}
+
+/* 时间显示 */
+.audio-panel .time-display {
+    min-width: 85px;
+    font-size: 14px;
+}
+
+/* 波形图容器 */
+.audio-panel .visual-container {
+    margin-top: 20px;
+}
+
+/* 分析结果部分 */
+.analysis-data {
+    flex-basis: 100%;
+    margin-top: 30px;
+}
+
+/* 响应式设计优化 */
+@media (max-width: 1024px) {
+    .audio-panel {
+        flex: 100%;
+    }
+    
+    .audio-panel .controls {
+        gap: 15px;
+    }
+    
+    .audio-panel .playback-controls {
+        flex-wrap: wrap;
+    }
+} 
