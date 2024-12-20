@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>声纹分析系统</title>
+    <title>声纹分析与模拟系统 - 声纹分析</title>
     <link rel="stylesheet" href="styles/common.css">
     <link rel="stylesheet" href="styles/controls.css">
     <link rel="stylesheet" href="styles/analysis.css">
@@ -28,6 +28,7 @@
                     <input type="file" id="audioFile" accept="audio/*">
                     <span>上传音频</span>
                 </label>
+                <p id="statusText" class="status-text">等待输入...</p>
             
 
                 <div class="playback-controls">
@@ -40,10 +41,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="status">
-                <p id="statusText">等待输入...</p>
             </div>
 
             <div class="visualization">

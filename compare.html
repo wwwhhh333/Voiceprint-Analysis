@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>声纹对比 - 声纹分析系统</title>
+    <title>声纹分析与模拟系统 - 声纹对比</title>
     <link rel="stylesheet" href="styles/common.css">
     <link rel="stylesheet" href="styles/controls.css">
     <link rel="stylesheet" href="styles/analysis.css">
@@ -22,114 +22,129 @@
         
         <div class="body-contianer">
             <div class="compare-container">
-                <div class="audio-panel">
-                    <h3>音频 A</h3>
-                    <div class="controls">
-                        <div class="input-controls">
-                            <button id="recordBtnA" class="btn">开始录制</button>
-                            <label class="upload-btn">
-                                <input type="file" id="audioFileA" accept="audio/*">
-                                <span>上传音频</span>
-                            </label>
-                        </div>
-                        <div class="playback-controls">
-                            <button id="playPauseBtnA" class="btn" disabled>播放</button>
-                            <div class="progress-container">
-                                <input type="range" id="progressBarA" min="0" max="100" value="0" disabled>
-                                <div class="time-display">
-                                    <span id="currentTimeA">00:00</span> / 
-                                    <span id="totalTimeA">00:00</span>
+                <div class="input-panel">
+                    <div class="audio-panels">
+                        <div class="audio-panel">
+                            <h3>音频 A</h3>
+                            <div class="controls">
+                                <div class="input-controls">
+                                    <button id="recordBtnA" class="btn">开始录制</button>
+                                    <label class="upload-btn">
+                                        <input type="file" id="audioFileA" accept="audio/*">
+                                        <span>上传音频</span>
+                                    </label>
                                 </div>
+                                <div class="playback-controls">
+                                    <button id="playPauseBtnA" class="btn" disabled>播放</button>
+                                    <div class="progress-container">
+                                        <input type="range" id="progressBarA" min="0" max="100" value="0" disabled>
+                                        <div class="time-display">
+                                            <span id="currentTimeA">00:00</span> / 
+                                            <span id="totalTimeA">00:00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="visual-container">
+                                <canvas id="waveformA"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="audio-panel">
+                            <h3>音频 B</h3>
+                            <div class="controls">
+                                <div class="input-controls">
+                                    <button id="recordBtnB" class="btn">开始录制</button>
+                                    <label class="upload-btn">
+                                        <input type="file" id="audioFileB" accept="audio/*">
+                                        <span>上传音频</span>
+                                    </label>
+                                </div>
+                                <div class="playback-controls">
+                                    <button id="playPauseBtnB" class="btn" disabled>播放</button>
+                                    <div class="progress-container">
+                                        <input type="range" id="progressBarB" min="0" max="100" value="0" disabled>
+                                        <div class="time-display">
+                                            <span id="currentTimeB">00:00</span> / 
+                                            <span id="totalTimeB">00:00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="visual-container">
+                                <canvas id="waveformB"></canvas>
                             </div>
                         </div>
                     </div>
-                    <div class="visual-container">
-                        <canvas id="waveformA"></canvas>
+
+                    <div class="compare-action">
+                        <button id="startCompareBtn" class="compare-btn" disabled>开始对比</button>
                     </div>
                 </div>
 
-                <div class="audio-panel">
-                    <h3>音频 B</h3>
-                    <div class="controls">
-                        <div class="input-controls">
-                            <button id="recordBtnB" class="btn">开始录制</button>
-                            <label class="upload-btn">
-                                <input type="file" id="audioFileB" accept="audio/*">
-                                <span>上传音频</span>
-                            </label>
+                <div class="result-panel" style="display: none;">
+                    <div class="result-header">
+                        <button id="backToInput" class="back-btn">返回</button>
+                        <h3>对比结果</h3>
+                    </div>
+                    <div class="analysis-data">
+                        <div class="data-grid">
+                            <div class="data-item">
+                                <span>声纹相似度</span>
+                                <span id="similarityScore">0%</span>
+                            </div>
+                            <div class="data-item">
+                                <span>音色匹配度</span>
+                                <span id="timbreMatch">0%</span>
+                            </div>
+                            <div class="data-item">
+                                <span>语音特征匹配</span>
+                                <span id="featureMatch">0%</span>
+                            </div>
                         </div>
-                        <div class="playback-controls">
-                            <button id="playPauseBtnB" class="btn" disabled>播放</button>
-                            <div class="progress-container">
-                                <input type="range" id="progressBarB" min="0" max="100" value="0" disabled>
-                                <div class="time-display">
-                                    <span id="currentTimeB">00:00</span> / 
-                                    <span id="totalTimeB">00:00</span>
+                        
+                        <div class="features-comparison">
+                            <div class="analysis-section">
+                                <h4>音色特征对比</h4>
+                                <div class="data-grid">
+                                    <div class="data-item">
+                                        <span>谐波结构</span>
+                                        <span id="harmonicStructure">0%</span>
+                                    </div>
+                                    <div class="data-item">
+                                        <span>频谱包络</span>
+                                        <span id="spectralEnvelope">0%</span>
+                                    </div>
+                                    <div class="data-item">
+                                        <span>音色亮度</span>
+                                        <span id="brightness">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="analysis-section">
+                                <h4>语音特征对比</h4>
+                                <div class="data-grid">
+                                    <div class="data-item">
+                                        <span>语速相似度</span>
+                                        <span id="speechRate">0%</span>
+                                    </div>
+                                    <div class="data-item">
+                                        <span>音高变化</span>
+                                        <span id="pitchVariation">0%</span>
+                                    </div>
+                                    <div class="data-item">
+                                        <span>能量分布</span>
+                                        <span id="energyDistribution">0%</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="visual-container">
-                        <canvas id="waveformB"></canvas>
-                    </div>
-                </div>
-
-                <div class="analysis-data">
-                    <h3>对比结果</h3>
-                    <div class="data-grid">
-                        <div class="data-item">
-                            <span>声纹相似度</span>
-                            <span id="similarityScore">0%</span>
+                        
+                        <div class="conclusion">
+                            <h4>分析结论</h4>
+                            <p id="comparisonConclusion" class="status">请上传两段音频进行对比</p>
                         </div>
-                        <div class="data-item">
-                            <span>音色匹配度</span>
-                            <span id="timbreMatch">0%</span>
-                        </div>
-                        <div class="data-item">
-                            <span>语音特征匹配</span>
-                            <span id="featureMatch">0%</span>
-                        </div>
-                    </div>
-                    
-                    <div class="analysis-section">
-                        <h4>音色特征对比</h4>
-                        <div class="data-grid">
-                            <div class="data-item">
-                                <span>谐波结构</span>
-                                <span id="harmonicStructure">0%</span>
-                            </div>
-                            <div class="data-item">
-                                <span>频谱包络</span>
-                                <span id="spectralEnvelope">0%</span>
-                            </div>
-                            <div class="data-item">
-                                <span>音色亮度</span>
-                                <span id="brightness">0%</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="analysis-section">
-                        <h4>语音特征对比</h4>
-                        <div class="data-grid">
-                            <div class="data-item">
-                                <span>语速相似度</span>
-                                <span id="speechRate">0%</span>
-                            </div>
-                            <div class="data-item">
-                                <span>音高变化</span>
-                                <span id="pitchVariation">0%</span>
-                            </div>
-                            <div class="data-item">
-                                <span>能量分布</span>
-                                <span id="energyDistribution">0%</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="conclusion">
-                        <h4>分析结论</h4>
-                        <p id="comparisonConclusion" class="status">请上传两段音频进行对比</p>
                     </div>
                 </div>
             </div>

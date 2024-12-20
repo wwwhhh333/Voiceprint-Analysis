@@ -22,6 +22,8 @@ class VoiceprintCompareSystem {
         this.recordControllerA.setVisualizer(this.visualizerA);
         this.recordControllerB.setVisualizer(this.visualizerB);
         
+        this.compareBtn = document.getElementById('startCompareBtn');
+        
         this.setupEventListeners();
         this.startVisualization();
     }
@@ -64,8 +66,49 @@ class VoiceprintCompareSystem {
                 this.audioControllerB.enablePlaybackControls();
                 this.audioControllerB.updateTotalTime(audioBuffer.duration);
             }
+            this.checkEnableCompareButton();
             setTimeout(() => this.compareAudio(), 500);
         });
+
+        // 对比按钮点击事件
+        this.compareBtn.addEventListener('click', () => {
+            const inputPanel = document.querySelector('.input-panel');
+            const resultPanel = document.querySelector('.result-panel');
+            
+            // 添加淡出动画类
+            inputPanel.style.animation = 'contentFade 0.3s ease-out reverse';
+            
+            // 等待淡出动画完成后切换面板
+            setTimeout(() => {
+                inputPanel.style.display = 'none';
+                resultPanel.style.display = 'block';
+                this.compareAudio();
+            }, 300);
+        });
+
+        // 返回按钮点击事件
+        document.getElementById('backToInput').addEventListener('click', () => {
+            const inputPanel = document.querySelector('.input-panel');
+            const resultPanel = document.querySelector('.result-panel');
+            
+            // 添加淡出动画类
+            resultPanel.style.animation = 'contentFade 0.3s ease-out reverse';
+            
+            // 等待淡出动画完成后切换面板
+            setTimeout(() => {
+                resultPanel.style.display = 'none';
+                inputPanel.style.display = 'flex';
+                // 重置动画
+                inputPanel.style.animation = 'contentFade 0.4s ease-out';
+            }, 300);
+        });
+    }
+
+    // 检查是否可以启用对比按钮
+    checkEnableCompareButton() {
+        const hasAudioA = !!this.audioControllerA.audioBuffer;
+        const hasAudioB = !!this.audioControllerB.audioBuffer;
+        this.compareBtn.disabled = !(hasAudioA && hasAudioB);
     }
 
     async handleFileUpload(event, type) {
@@ -92,6 +135,7 @@ class VoiceprintCompareSystem {
                             this.audioControllerB.enablePlaybackControls();
                             this.audioControllerB.updateTotalTime(audioBuffer.duration);
                         }
+                        this.checkEnableCompareButton();  // 检查是否可以启用对比按钮
                         if (this.audioControllerA.audioBuffer && this.audioControllerB.audioBuffer) {
                             setTimeout(() => this.compareAudio(), 500);
                         }
