@@ -147,6 +147,7 @@ h1 {
         transform: translateY(0);
         filter: blur(0);
     }
+
 }
 
 /* 页面内容切换动画 */
@@ -174,6 +175,7 @@ h1 {
         opacity: 1;
         transform: translateY(0);
     }
+
 }
 
 /* 数据项滑入动画 */

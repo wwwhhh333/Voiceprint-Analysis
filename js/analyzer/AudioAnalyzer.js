@@ -3,7 +3,7 @@
 import { getAudioContext } from '../utils/AudioContext.js';
 
 export class AudioAnalyzer {
-    constructor() {
+    constructor() { 
         this.audioContext = getAudioContext();
         this.analyser = this.audioContext.createAnalyser();
         this.waveAnalyser = this.audioContext.createAnalyser();

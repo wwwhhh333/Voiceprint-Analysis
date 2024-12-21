@@ -29,7 +29,7 @@ export class Visualizer {
         canvas.height = canvas.offsetHeight;
     }
 
-    draw() {
+    draw() { //绘制波形和频谱图
         if (this.waveformCanvas) {
             this.drawWaveform();
         }
@@ -38,7 +38,7 @@ export class Visualizer {
         }
     }
 
-    drawWaveform() {
+    drawWaveform() { //绘制波形
         const dataArray = this.audioAnalyzer.getWaveformData();
         const width = this.waveformCanvas.width;
         const height = this.waveformCanvas.height;
@@ -67,7 +67,7 @@ export class Visualizer {
         this.waveformCtx.stroke();
     }
 
-    drawSpectrogram() {
+    drawSpectrogram() { //绘制频谱图
         const dataArray = this.audioAnalyzer.getFrequencyData();
         const width = this.spectrogramCanvas.width;
         const height = this.spectrogramCanvas.height;

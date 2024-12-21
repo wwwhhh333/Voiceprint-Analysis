@@ -1,0 +1,12 @@
+{
+  "name": "voiceprint",
+  "version": "1.0.0",
+  "description": "这是一个基于Web的声纹分析系统，可以对音频进行实时分析、可视化展示，并支持声纹对比功能。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
