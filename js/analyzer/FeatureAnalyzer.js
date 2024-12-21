@@ -5,6 +5,31 @@ export class FeatureAnalyzer {
         this.audioAnalyzer = audioAnalyzer;
         this.lastUpdate = 0;
         this.updateInterval = 100;
+        
+        // 初始化MFCC分析器
+        if (typeof Meyda === 'undefined') {
+            console.error('Meyda库未加载，MFCC分析将不可用');
+            this.mfccAnalyzer = null;
+        } else {
+            try {
+                this.mfccAnalyzer = Meyda.createMeydaAnalyzer({
+                    audioContext: this.audioAnalyzer.audioContext,
+                    source: this.audioAnalyzer.analyser,
+                    bufferSize: 2048,
+                    numberOfMFCCCoefficients: 13,
+                    featureExtractors: [
+                        'mfcc',
+                        'spectralSpread',
+                        'perceptualSharpness',
+                        'loudness'
+                    ]
+                });
+                console.log('MFCC分析器初始化成功');
+            } catch (error) {
+                console.error('MFCC分析器初始化失败:', error);
+                this.mfccAnalyzer = null;
+            }
+        }
     }
 
     analyze() {
@@ -17,6 +42,8 @@ export class FeatureAnalyzer {
             
             this.updateTimeAnalysis(timeData);
             this.updateFrequencyAnalysis(freqData);
+            this.updatePerceptualAnalysis();
+            this.drawMFCC();
         }
     }
 
@@ -52,6 +79,64 @@ export class FeatureAnalyzer {
         const centroid = this.calculateSpectralCentroid(freqData);
         document.getElementById('spectralCentroid').textContent = 
             `${Math.round(centroid)} Hz`;
+    }
+
+    updatePerceptualAnalysis() {
+        if (this.mfccAnalyzer) {
+            const features = this.mfccAnalyzer.get();
+            if (features) {
+                // 更新频谱扩散
+                if (features.spectralSpread !== undefined) {
+                    document.getElementById('spectralSpread').textContent = 
+                        `${Math.round(features.spectralSpread)} Hz`;
+                }
+                
+                // 更新感知锐度
+                if (features.perceptualSharpness !== undefined) {
+                    document.getElementById('perceptualSharpness').textContent = 
+                        features.perceptualSharpness.toFixed(2);
+                }
+                
+                // 更新响度动态
+                if (features.loudness && features.loudness.total !== undefined) {
+                    document.getElementById('loudnessDynamics').textContent = 
+                        `${Math.round(features.loudness.total)} dB`;
+                }
+            }
+        }
+    }
+
+    drawMFCC() {
+        if (this.mfccAnalyzer) {
+            const features = this.mfccAnalyzer.get();
+            if (features && features.mfcc) {
+                const canvas = document.getElementById('mfccCanvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                const width = canvas.width;
+                const height = canvas.height;
+                
+                // 清空画布
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, width, height);
+                
+                // 绘制MFCC系数
+                const barWidth = width / features.mfcc.length;
+                const maxValue = Math.max(...features.mfcc.map(Math.abs));
+                
+                features.mfcc.forEach((coef, i) => {
+                    const normalizedValue = coef / maxValue;
+                    const barHeight = Math.abs(normalizedValue) * (height / 2);
+                    const y = normalizedValue > 0 ? height/2 - barHeight : height/2;
+                    
+                    // 使用渐变色
+                    const hue = (i / features.mfcc.length) * 360;
+                    ctx.fillStyle = `hsl(${hue}, 80%, 50%)`;
+                    ctx.fillRect(i * barWidth, y, barWidth - 1, barHeight);
+                });
+            }
+        }
     }
 
     calculateEffectiveDuration(timeData) {

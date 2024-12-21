@@ -22,7 +22,7 @@ class VoiceprintCompareSystem {
         this.recordControllerA.setVisualizer(this.visualizerA);
         this.recordControllerB.setVisualizer(this.visualizerB);
         
-        this.compareBtn = document.getElementById('startCompareBtn');
+        this.compareBtn = document.getElementById('compareBtn');
         
         this.setupEventListeners();
         this.startVisualization();
@@ -71,37 +71,48 @@ class VoiceprintCompareSystem {
         });
 
         // 对比按钮点击事件
-        this.compareBtn.addEventListener('click', () => {
-            const inputPanel = document.querySelector('.input-panel');
-            const resultPanel = document.querySelector('.result-panel');
-            
-            // 添加淡出动画类
-            inputPanel.style.animation = 'contentFade 0.3s ease-out reverse';
-            
-            // 等待淡出动画完成后切换面板
-            setTimeout(() => {
-                inputPanel.style.display = 'none';
-                resultPanel.style.display = 'block';
-                this.compareAudio();
-            }, 300);
-        });
+        if (this.compareBtn) {
+            console.log('添加对比按钮点击监听器');
+            this.compareBtn.addEventListener('click', () => {
+                const inputPanel = document.querySelector('.input-panel');
+                const resultPanel = document.querySelector('.result-panel');
+                
+                // 添加淡出动画类
+                inputPanel.style.animation = 'contentFade 0.3s ease-out reverse';
+                
+                // 等待淡出动画完成后切换面板
+                setTimeout(() => {
+                    inputPanel.style.display = 'none';
+                    resultPanel.style.display = 'block';
+                    this.compareAudio();
+                }, 300);
+            });
+        } else {
+            console.error('未找到对比按钮元素');
+        }
 
         // 返回按钮点击事件
-        document.getElementById('backToInput').addEventListener('click', () => {
-            const inputPanel = document.querySelector('.input-panel');
-            const resultPanel = document.querySelector('.result-panel');
-            
-            // 添加淡出动画类
-            resultPanel.style.animation = 'contentFade 0.3s ease-out reverse';
-            
-            // 等待淡出动画完成后切换面板
-            setTimeout(() => {
-                resultPanel.style.display = 'none';
-                inputPanel.style.display = 'flex';
-                // 重置动画
-                inputPanel.style.animation = 'contentFade 0.4s ease-out';
-            }, 300);
-        });
+        const backBtn = document.getElementById('backBtn');
+        if (backBtn) {
+            console.log('添加返回按钮点击监听器');
+            backBtn.addEventListener('click', () => {
+                const inputPanel = document.querySelector('.input-panel');
+                const resultPanel = document.querySelector('.result-panel');
+                
+                // 添加淡出动画类
+                resultPanel.style.animation = 'contentFade 0.3s ease-out reverse';
+                
+                // 等待淡出动画完成后切换面板
+                setTimeout(() => {
+                    resultPanel.style.display = 'none';
+                    inputPanel.style.display = 'flex';
+                    // 重置动画
+                    inputPanel.style.animation = 'contentFade 0.4s ease-out';
+                }, 300);
+            });
+        } else {
+            console.error('未找到返回按钮元素');
+        }
     }
 
     // 检查是否可以启用对比按钮
@@ -158,6 +169,17 @@ class VoiceprintCompareSystem {
         console.log('开始对比音频...');
         if (this.audioControllerA.audioBuffer && this.audioControllerB.audioBuffer) {
             console.log('两个音频都已加载，进行对比分析');
+            console.log('音频A:', {
+                duration: this.audioControllerA.audioBuffer.duration,
+                sampleRate: this.audioControllerA.audioBuffer.sampleRate,
+                length: this.audioControllerA.audioBuffer.length
+            });
+            console.log('音频B:', {
+                duration: this.audioControllerB.audioBuffer.duration,
+                sampleRate: this.audioControllerB.audioBuffer.sampleRate,
+                length: this.audioControllerB.audioBuffer.length
+            });
+            
             try {
                 await new Promise(resolve => requestAnimationFrame(resolve));
                 
@@ -166,7 +188,7 @@ class VoiceprintCompareSystem {
                     this.audioControllerB.audioBuffer
                 );
                 
-                console.log('对比结果:', results);
+                console.log('对比结果:', JSON.stringify(results, null, 2));
                 if (results && results.details) {
                     this.updateResults(results);
                 } else {
@@ -187,163 +209,113 @@ class VoiceprintCompareSystem {
 
     updateResults(results) {
         try {
-            console.log('更新结果显示:', results);
+            console.log('开始更新结果显示');
+            console.log('结果数据:', JSON.stringify(results, null, 2));
             
-            // 更新基本相似度数据
-            document.getElementById('similarityScore').textContent = 
-                `${Math.round((results.similarity || 0) * 100)}%`;
-            document.getElementById('timbreMatch').textContent = 
-                `${Math.round((results.timbreMatch || 0) * 100)}%`;
-            document.getElementById('featureMatch').textContent = 
-                `${Math.round((results.featureMatch || 0) * 100)}%`;
+            // 更新总体相似度
+            const overallScore = Math.round((results.similarity || 0) * 100);
+            const timbreScore = Math.round((results.timbreMatch || 0) * 100);
+            const pitchScore = Math.round((results.pitchMatch || 0) * 100);
+            const rhythmScore = Math.round((results.rhythmMatch || 0) * 100);
+            
+            console.log('相似度评分:', {
+                overallScore,
+                timbreScore,
+                pitchScore,
+                rhythmScore
+            });
+            
+            // 更新总体评分
+            document.getElementById('overallScore').textContent = `${overallScore}%`;
+            document.getElementById('timbreScore').textContent = `${timbreScore}%`;
+            document.getElementById('pitchScore').textContent = `${pitchScore}%`;
+            document.getElementById('rhythmScore').textContent = `${rhythmScore}%`;
 
-            // 更新详细对比结果
+            // 更新详细特征匹配度
             const details = results.details || {};
             const timbreFeatures = details.timbreFeatures || {};
-            const voiceFeatures = details.voiceFeatures || {};
             
-            // 更新音色特征对比
-            document.getElementById('harmonicStructure').textContent = 
-                `${Math.round((timbreFeatures.harmonicStructure || 0) * 100)}%`;
-            document.getElementById('spectralEnvelope').textContent = 
-                `${Math.round((timbreFeatures.spectralEnvelope || 0) * 100)}%`;
-            document.getElementById('brightness').textContent = 
-                `${Math.round((timbreFeatures.brightness || 0) * 100)}%`;
+            console.log('音色特征:', timbreFeatures);
             
-            // 更新语音特征对比
-            document.getElementById('speechRate').textContent = 
-                `${Math.round((voiceFeatures.speechRate || 0) * 100)}%`;
-            document.getElementById('pitchVariation').textContent = 
-                `${Math.round((voiceFeatures.pitchVariation || 0) * 100)}%`;
-            document.getElementById('energyDistribution').textContent = 
-                `${Math.round((voiceFeatures.energyDistribution || 0) * 100)}%`;
+            // 音色特征对比
+            document.getElementById('harmonicsMatch').textContent = 
+                `${Math.round((timbreFeatures.harmonicsMatch || 0) * 100)}%`;
+            document.getElementById('spectralMatch').textContent = 
+                `${Math.round((timbreFeatures.spectralMatch || 0) * 100)}%`;
+            document.getElementById('timbreMatch').textContent = 
+                `${Math.round((timbreFeatures.timbreFeatureMatch || 0) * 100)}%`;
+            
+            // 声学特征对比
+            document.getElementById('pitchRangeMatch').textContent = 
+                `${Math.round((details.pitchRangeMatch || 0) * 100)}%`;
+            document.getElementById('energyMatch').textContent = 
+                `${Math.round((details.energyMatch || 0) * 100)}%`;
+            document.getElementById('formantMatch').textContent = 
+                `${Math.round((details.formantMatch || 0) * 100)}%`;
 
-            // 更新结论
-            const conclusion = this.getConclusion(results);
-            document.getElementById('comparisonConclusion').textContent = conclusion;
-
-            // 添加动画效果
-            this.animateResults();
+            // 生成分析结论
+            let conclusion = '';
+            const similarityLevel = this.getSimilarityLevel(overallScore);
+            conclusion = `两段语音的总体相似度为 ${overallScore}%，${similarityLevel}。\n\n`;
+            
+            // 添加详细分析
+            conclusion += `详细分析：\n`;
+            conclusion += `• 音色相似度：${timbreScore}%\n`;
+            conclusion += `• 音高相似度：${pitchScore}%\n`;
+            conclusion += `• 节奏相似度：${rhythmScore}%\n\n`;
+            
+            // 添加主要差异和相似点
+            const strengths = [];
+            const weaknesses = [];
+            
+            // 音色特征分析
+            const harmonicsScore = Math.round((timbreFeatures.harmonicsMatch || 0) * 100);
+            const spectralScore = Math.round((timbreFeatures.spectralMatch || 0) * 100);
+            const timbreFeatureScore = Math.round((timbreFeatures.timbreFeatureMatch || 0) * 100);
+            
+            if (harmonicsScore >= 80) strengths.push('谐波结构高度匹配');
+            else if (harmonicsScore < 60) weaknesses.push('谐波结构存在差异');
+            
+            if (spectralScore >= 80) strengths.push('频谱特征高度匹配');
+            else if (spectralScore < 60) weaknesses.push('频谱特征存在差异');
+            
+            if (timbreFeatureScore >= 80) strengths.push('音色特征高度匹配');
+            else if (timbreFeatureScore < 60) weaknesses.push('音色特征存在差异');
+            
+            // 音高和节奏特征分析
+            if (pitchScore >= 80) strengths.push('音高特征高度匹配');
+            else if (pitchScore < 60) weaknesses.push('音高特征存在明显差异');
+            
+            if (rhythmScore >= 80) strengths.push('节奏特征高度匹配');
+            else if (rhythmScore < 60) weaknesses.push('节奏特征存在明显差异');
+            
+            if (weaknesses.length > 0) {
+                conclusion += `主要差异：\n• ${weaknesses.join('\n• ')}\n\n`;
+            }
+            if (strengths.length > 0) {
+                conclusion += `主要相似点：\n• ${strengths.join('\n• ')}`;
+            }
+            
+            document.getElementById('conclusionText').textContent = conclusion;
             
         } catch (error) {
             console.error('更新结果显示时出错:', error);
+            console.error(error.stack);
         }
     }
 
-    getConclusion(results) {
-        const averageMatch = results.similarity;
-        const details = results.details;
-        
-        // 计算详细特征的平均匹配度
-        const timbreAvg = (details.timbreFeatures.harmonicStructure + 
-                          details.timbreFeatures.spectralEnvelope + 
-                          details.timbreFeatures.brightness) / 3;
-        
-        const voiceAvg = (details.voiceFeatures.speechRate + 
-                         details.voiceFeatures.pitchVariation + 
-                         details.voiceFeatures.energyDistribution) / 3;
-        
-        // 分析具体特征的强弱项
-        const strengths = [];
-        const weaknesses = [];
-        
-        // 分析音色特征
-        if (details.timbreFeatures.harmonicStructure > 0.8) {
-            strengths.push('谐波结构高度相似');
-        } else if (details.timbreFeatures.harmonicStructure < 0.4) {
-            weaknesses.push('谐波结构差异较大');
-        }
-        
-        if (details.timbreFeatures.spectralEnvelope > 0.8) {
-            strengths.push('频谱包络特征匹配');
-        } else if (details.timbreFeatures.spectralEnvelope < 0.4) {
-            weaknesses.push('频谱包络特征差异明显');
-        }
-        
-        // 分析语音特征
-        if (details.voiceFeatures.speechRate > 0.8) {
-            strengths.push('语速特征高度一致');
-        } else if (details.voiceFeatures.speechRate < 0.4) {
-            weaknesses.push('语速差异较大');
-        }
-        
-        if (details.voiceFeatures.pitchVariation > 0.8) {
-            strengths.push('音高变化模式相似');
-        } else if (details.voiceFeatures.pitchVariation < 0.4) {
-            weaknesses.push('音高变化模式差异明显');
-        }
-        
-        // 生成结论文本
-        let conclusion = '';
-        
-        if (averageMatch > 0.8) {
-            conclusion = `极大可能是同一个人（置信度：${Math.round(averageMatch * 100)}%）\n`;
-            conclusion += `\n主要判断依据：\n`;
-            conclusion += `• 音色特征匹配度：${Math.round(timbreAvg * 100)}%\n`;
-            conclusion += `• 语音特征匹配度：${Math.round(voiceAvg * 100)}%\n`;
-            if (strengths.length > 0) {
-                conclusion += `\n突出特征：\n• ${strengths.join('\n• ')}`;
-            }
-        } else if (averageMatch > 0.6) {
-            conclusion = `可能是同一个人（置信度：${Math.round(averageMatch * 100)}%）\n`;
-            conclusion += `\n分析结果：\n`;
-            conclusion += `• 音色特征匹配度：${Math.round(timbreAvg * 100)}%\n`;
-            conclusion += `• 语音特征匹配度：${Math.round(voiceAvg * 100)}%\n`;
-            if (strengths.length > 0) {
-                conclusion += `\n相似特征：\n• ${strengths.join('\n• ')}`;
-            }
-            if (weaknesses.length > 0) {
-                conclusion += `\n差异特征：\n• ${weaknesses.join('\n• ')}`;
-            }
-        } else if (averageMatch > 0.4) {
-            conclusion = `相似度一般，难以判断（置信度：${Math.round(averageMatch * 100)}%）\n`;
-            conclusion += `\n具体分析：\n`;
-            conclusion += `• 音色特征匹配度：${Math.round(timbreAvg * 100)}%\n`;
-            conclusion += `• 语音特征匹配度：${Math.round(voiceAvg * 100)}%\n`;
-            conclusion += `\n存在的差异：\n• ${weaknesses.join('\n• ')}`;
-            if (strengths.length > 0) {
-                conclusion += `\n相似之处：\n• ${strengths.join('\n• ')}`;
-            }
-        } else {
-            conclusion = `可能不是同一个人（置信度：${Math.round((1 - averageMatch) * 100)}%）\n`;
-            conclusion += `\n主要差异：\n`;
-            conclusion += `• 音色特征差异度：${Math.round((1 - timbreAvg) * 100)}%\n`;
-            conclusion += `• 语音特征差异度：${Math.round((1 - voiceAvg) * 100)}%\n`;
-            if (weaknesses.length > 0) {
-                conclusion += `\n具体差异：\n• ${weaknesses.join('\n• ')}`;
-            }
-        }
-        
-        return conclusion;
-    }
-
-    animateResults() {
-        // 为结果添加动画效果
-        const resultItems = document.querySelectorAll('.result-item');
-        resultItems.forEach((item, index) => {
-            item.style.animation = 'none';
-            item.offsetHeight; // 触发重绘
-            item.style.animation = `fadeIn 0.5s ${index * 0.1}s forwards`;
-        });
-
-        const conclusion = document.querySelector('.conclusion');
-        conclusion.style.animation = 'none';
-        conclusion.offsetHeight;
-        conclusion.style.animation = 'slideIn 0.5s 0.3s forwards';
+    getSimilarityLevel(score) {
+        if (score >= 90) return '属于极高相似';
+        if (score >= 80) return '属于高度相似';
+        if (score >= 60) return '属于中等相似';
+        if (score >= 40) return '属于低度相似';
+        return '差异显著';
     }
 
     startVisualization() {
-        const animate = () => {
-            // 更新两个波形图（仅在播放时）
-            if (this.audioControllerA.isPlaying) {
-                this.visualizerA.draw();
-            }
-            if (this.audioControllerB.isPlaying) {
-                this.visualizerB.draw();
-            }
-            requestAnimationFrame(animate);
-        };
-        animate();
+        // 启动波形可视化
+        this.visualizerA.start();
+        this.visualizerB.start();
     }
 }
 

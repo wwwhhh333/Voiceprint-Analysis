@@ -170,3 +170,128 @@ input[type="range"] {
     margin-left: auto;  /* 推到右边 */
     margin-right: 20px;  /* 与播放控制保持间距 */
 }
+
+.audio-controls {
+    margin-bottom: 2rem;
+}
+
+.audio-input {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.audio-group {
+    background-color: var(--surface-color);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.audio-group h3 {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.audio-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.record-button,
+.upload-button {
+    flex: 1;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.record-button {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.record-button:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.record-button.recording {
+    background-color: var(--error-color);
+    animation: pulse 1.5s infinite;
+}
+
+.upload-button {
+    background-color: var(--surface-color-light);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.upload-button:hover {
+    background-color: var(--surface-color-dark);
+}
+
+.audio-player {
+    width: 100%;
+}
+
+.audio-player audio {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.compare-controls {
+    text-align: center;
+}
+
+.compare-button {
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.compare-button:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.compare-button:disabled {
+    background-color: var(--disabled-color);
+    cursor: not-allowed;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 768px) {
+    .audio-input {
+        grid-template-columns: 1fr;
+    }
+    
+    .audio-group {
+        padding: 1rem;
+    }
+    
+    .compare-button {
+        width: 100%;
+        padding: 0.8rem;
+    }
+}

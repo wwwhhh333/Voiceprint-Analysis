@@ -3,304 +3,413 @@
  */
 export class MeydaAnalyzer {
     constructor() {
+        // 设置特征提取参数
         this.features = [
-            'mfcc',           // 梅尔频率倒谱系数
-            'spectralCentroid', // 频谱质心
-            'spectralRolloff',  // 频谱滚降点
-            'spectralFlatness', // 频谱平坦度
-            'spectralSpread',   // 频谱扩散度
-            'rms',             // 均方根能量
-            'zcr',             // 过零率
-            'energy',          // 能量
-            'perceptualSpread', // 感知频谱扩散
-            'perceptualSharpness' // 感知锐度
+            'mfcc',
+            'spectralCentroid',
+            'spectralRolloff',
+            'spectralFlatness',
+            'spectralSpread',
+            'perceptualSpread',
+            'perceptualSharpness',
+            'rms',
+            'zcr',
+            'loudness'
         ];
         
-        // 创建离线音频上下文
-        this.audioContext = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, 2048, 44100);
+        // 设置MFCC系数数量
+        this.mfccCoefficients = 13;
+        
+        // 设置帧大小和重叠
+        this.frameSize = 2048;
+        this.hopSize = 1024;
     }
-
+    
     /**
-     * 从音频缓冲区提取声纹特征
+     * 提取音频特征
      * @param {AudioBuffer} audioBuffer - 音频缓冲区
-     * @returns {Object} 提取的声纹特征
+     * @returns {Object} 提取的特征
      */
     async extractFeatures(audioBuffer) {
         try {
             console.log('开始提取特征...');
-            const audioData = audioBuffer.getChannelData(0); // 获取单声道数据
-            const frameSize = 2048;
-            const features = {};
-            
-            // 分帧处理音频数据
-            const numFrames = Math.floor(audioData.length / frameSize);
-            const frameFeatures = [];
-            
-            // 配置 Meyda
-            Meyda.bufferSize = frameSize;
-            
-            for (let i = 0; i < numFrames; i++) {
-                const frame = audioData.slice(i * frameSize, (i + 1) * frameSize);
-                try {
-                    const frameFeature = Meyda.extract(this.features, frame);
-                    if (frameFeature) {
-                        // 计算响度值（使用 RMS 和能量特征的组合）
-                        frameFeature.loudnessValue = this.calculateLoudnessValue(frameFeature);
-                        frameFeatures.push(frameFeature);
-                    }
-                } catch (error) {
-                    console.warn('帧特征提取失败:', error);
-                    continue;
-                }
-            }
-            
-            console.log('帧特征提取完成，总帧数:', frameFeatures.length);
-            
-            if (frameFeatures.length === 0) {
-                throw new Error('没有成功提取到任何特征');
-            }
-            
-            // 计算每个特征的平均值
-            this.features.forEach(feature => {
-                if (feature === 'mfcc') {
-                    features[feature] = this.averageMFCC(frameFeatures);
-                } else {
-                    features[feature] = this.averageFeature(frameFeatures, feature);
-                }
+            console.log('音频信息:', {
+                duration: audioBuffer.duration,
+                sampleRate: audioBuffer.sampleRate,
+                numberOfChannels: audioBuffer.numberOfChannels,
+                length: audioBuffer.length
             });
             
-            // 添加响度值
-            features.loudnessValue = this.averageFeature(frameFeatures, 'loudnessValue');
+            // 创建离线音频上下文
+            const offlineCtx = new OfflineAudioContext(
+                1,
+                audioBuffer.length,
+                audioBuffer.sampleRate
+            );
             
-            return features;
+            // 创建音频源节点
+            const sourceNode = offlineCtx.createBufferSource();
+            sourceNode.buffer = audioBuffer;
+            
+            // 创建脚本处理器节点
+            const scriptNode = offlineCtx.createScriptProcessor(this.frameSize, 1, 1);
+            
+            // 存储每一帧的特征
+            const frames = [];
+            
+            // 创建Meyda分析器
+            const meydaAnalyzer = Meyda.createMeydaAnalyzer({
+                audioContext: offlineCtx,
+                source: sourceNode,
+                bufferSize: this.frameSize,
+                numberOfMFCCCoefficients: this.mfccCoefficients,
+                featureExtractors: this.features
+            });
+            
+            console.log('Meyda分析器创建完成');
+            
+            // 设置音频处理回调
+            return new Promise((resolve, reject) => {
+                scriptNode.onaudioprocess = (e) => {
+                    try {
+                        const features = meydaAnalyzer.get();
+                        if (features) {
+                            frames.push(features);
+                        }
+                    } catch (error) {
+                        console.error('处理音频帧时出错:', error);
+                    }
+                };
+                
+                // 设置渲染完成回调
+                offlineCtx.oncomplete = async (e) => {
+                    try {
+                        console.log('特征提取完成，帧数:', frames.length);
+                        
+                        // 计算统计特征
+                        const statistics = this.calculateStatistics(frames);
+                        console.log('统计特征:', statistics);
+                        
+                        // 计算平均特征
+                        const mfcc = this.averageMFCC(frames);
+                        console.log('MFCC特征:', mfcc);
+                        
+                        const spectralCentroid = this.averageFeature(frames, 'spectralCentroid');
+                        const spectralRolloff = this.averageFeature(frames, 'spectralRolloff');
+                        const spectralFlatness = this.averageFeature(frames, 'spectralFlatness');
+                        const spectralSpread = this.averageFeature(frames, 'spectralSpread');
+                        const perceptualSpread = this.averageFeature(frames, 'perceptualSpread');
+                        const perceptualSharpness = this.averageFeature(frames, 'perceptualSharpness');
+                        const rms = this.averageFeature(frames, 'rms');
+                        const zcr = this.averageFeature(frames, 'zcr');
+                        const loudnessValue = this.calculateLoudnessValue(frames);
+                        
+                        console.log('平均特征:', {
+                            spectralCentroid,
+                            spectralRolloff,
+                            spectralFlatness,
+                            spectralSpread,
+                            perceptualSpread,
+                            perceptualSharpness,
+                            rms,
+                            zcr,
+                            loudnessValue
+                        });
+                        
+                        resolve({
+                            mfcc,
+                            spectralCentroid,
+                            spectralRolloff,
+                            spectralFlatness,
+                            spectralSpread,
+                            perceptualSpread,
+                            perceptualSharpness,
+                            rms,
+                            zcr,
+                            loudnessValue,
+                            statistics
+                        });
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                
+                // 连接节点
+                sourceNode.connect(scriptNode);
+                scriptNode.connect(offlineCtx.destination);
+                
+                // 开始处理
+                meydaAnalyzer.start();
+                sourceNode.start(0);
+                offlineCtx.startRendering().catch(reject);
+            });
             
         } catch (error) {
-            console.error('特征提取错误:', error);
-            throw error;
+            console.error('特征提取失败:', error);
+            console.error('错误堆栈:', error.stack);
+            return null;
         }
+    }
+    
+    /**
+     * 计算统计特征
+     * @param {Array} frames - 帧特征数组
+     * @returns {Object} 统计特征
+     */
+    calculateStatistics(frames) {
+        if (!frames || frames.length === 0) {
+            console.warn('没有有效的帧数据用于计算统计特征');
+            return {
+                rms: { mean: 0, stdDev: 0, changeRate: 0 },
+                spectralCentroid: { mean: 0, stdDev: 0, changeRate: 0 },
+                zcr: { mean: 0, stdDev: 0, changeRate: 0 }
+            };
+        }
+        
+        const features = ['rms', 'spectralCentroid', 'zcr'];
+        const stats = {};
+        
+        features.forEach(feature => {
+            const values = frames
+                .map(frame => frame[feature])
+                .filter(val => val !== undefined && !isNaN(val));
+            
+            if (values.length === 0) {
+                console.warn(`没有有效的${feature}数据`);
+                stats[feature] = { mean: 0, stdDev: 0, changeRate: 0 };
+                return;
+            }
+            
+            // 计算平均值
+            const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+            
+            // 计算标准差
+            const squaredDiffs = values.map(val => Math.pow(val - mean, 2));
+            const variance = squaredDiffs.reduce((sum, val) => sum + val, 0) / values.length;
+            const stdDev = Math.sqrt(variance);
+            
+            // 计算变化率
+            let changes = 0;
+            for (let i = 1; i < values.length; i++) {
+                if (Math.abs(values[i] - values[i-1]) > stdDev * 0.1) {
+                    changes++;
+                }
+            }
+            const changeRate = changes / (values.length - 1);
+            
+            stats[feature] = { mean, stdDev, changeRate };
+        });
+        
+        return stats;
+    }
+    
+    /**
+     * 计算平均MFCC
+     * @param {Array} frames - 帧特征数组
+     * @returns {Array} 平均MFCC
+     */
+    averageMFCC(frames) {
+        if (!frames || frames.length === 0) {
+            console.warn('没有有效的帧数据用于计算MFCC');
+            return new Array(this.mfccCoefficients).fill(0);
+        }
+        
+        const validFrames = frames.filter(frame => frame.mfcc && Array.isArray(frame.mfcc));
+        if (validFrames.length === 0) {
+            console.warn('没有包含有效MFCC数据的帧');
+            return new Array(this.mfccCoefficients).fill(0);
+        }
+        
+        const mfccSum = validFrames.reduce((sum, frame) => {
+            return sum.map((val, i) => val + (frame.mfcc[i] || 0));
+        }, new Array(this.mfccCoefficients).fill(0));
+        
+        return mfccSum.map(sum => sum / validFrames.length);
+    }
+    
+    /**
+     * 计算平均特征值
+     * @param {Array} frames - 帧特征数组
+     * @param {string} featureName - 特征名称
+     * @returns {number} 平均特征值
+     */
+    averageFeature(frames, featureName) {
+        if (!frames || frames.length === 0) {
+            console.warn(`没有有效的帧数据用于计算${featureName}`);
+            return 0;
+        }
+        
+        const validFrames = frames.filter(frame => 
+            frame[featureName] !== undefined && 
+            !isNaN(frame[featureName])
+        );
+        
+        if (validFrames.length === 0) {
+            console.warn(`没有包含有效${featureName}数据的帧`);
+            return 0;
+        }
+        
+        const sum = validFrames.reduce((acc, frame) => acc + frame[featureName], 0);
+        return sum / validFrames.length;
     }
     
     /**
      * 计算响度值
-     * @param {Object} features - 帧特征对象
+     * @param {Array} frames - 帧特征数组
      * @returns {number} 响度值
      */
-    calculateLoudnessValue(features) {
-        if (!features) return 0;
-        
-        // 使用 RMS 和能量特征的加权组合来估算响度
-        const rms = features.rms || 0;
-        const energy = features.energy || 0;
-        
-        // RMS 权重为 0.7，能量权重为 0.3
-        return (rms * 0.7 + energy * 0.3);
-    }
-    
-    /**
-     * 计算 MFCC 系数的平均值
-     * @param {Array} frameFeatures - 每帧的特征数据
-     * @returns {Array} MFCC 平均值
-     */
-    averageMFCC(frameFeatures) {
-        try {
-            const validFeatures = frameFeatures.filter(frame => frame && frame.mfcc && Array.isArray(frame.mfcc));
-            if (validFeatures.length === 0) {
-                console.warn('没有有效的 MFCC 特征');
-                return new Array(13).fill(0);
-            }
-            
-            const mfccSum = new Array(13).fill(0);
-            validFeatures.forEach(frame => {
-                frame.mfcc.forEach((value, index) => {
-                    if (!isNaN(value)) {
-                        mfccSum[index] += value;
-                    }
-                });
-            });
-            return mfccSum.map(sum => sum / validFeatures.length);
-        } catch (error) {
-            console.error('MFCC 平均值计算错误:', error);
-            return new Array(13).fill(0);
+    calculateLoudnessValue(frames) {
+        if (!frames || frames.length === 0) {
+            console.warn('没有有效的帧数据用于计算响度');
+            return 0;
         }
+        
+        const validFrames = frames.filter(frame => 
+            frame.loudness && 
+            typeof frame.loudness.total === 'number' && 
+            !isNaN(frame.loudness.total)
+        );
+        
+        if (validFrames.length === 0) {
+            console.warn('没有包含有效响度数据的帧');
+            return 0;
+        }
+        
+        const sum = validFrames.reduce((acc, frame) => acc + frame.loudness.total, 0);
+        return sum / validFrames.length;
     }
     
     /**
-     * 计算单个特征的平均值
-     * @param {Array} frameFeatures - 每帧的特征数据
-     * @param {string} feature - 特征名称
-     * @returns {number} 特征平均值
+     * 比较两组特征
+     * @param {Object} featuresA - 第一组特征
+     * @param {Object} featuresB - 第二组特征
+     * @returns {Object} 相似度结果
      */
-    averageFeature(frameFeatures, feature) {
-        try {
-            const validFeatures = frameFeatures.filter(frame => 
-                frame && 
-                frame[feature] !== undefined && 
-                !isNaN(frame[feature]) && 
-                isFinite(frame[feature])
-            );
+    compareFeatures(featuresA, featuresB) {
+        console.log('开始比较特征...');
+        console.log('特征A:', featuresA);
+        console.log('特征B:', featuresB);
+        
+        // 计算MFCC相似度
+        const mfccSimilarity = this.calculateMFCCSimilarity(
+            featuresA.mfcc,
+            featuresB.mfcc
+        );
+        console.log('MFCC相似度:', mfccSimilarity);
+        
+        // 计算频谱特征相似度
+        const spectralSimilarity = this.calculateSpectralSimilarity(
+            featuresA,
+            featuresB
+        );
+        console.log('频谱相似度:', spectralSimilarity);
+        
+        // 计算时域特征相似度
+        const temporalSimilarity = this.calculateTemporalSimilarity(
+            featuresA,
+            featuresB
+        );
+        console.log('时域相似度:', temporalSimilarity);
+        
+        // 计算总体相似度
+        const overall = (mfccSimilarity + spectralSimilarity + temporalSimilarity) / 3;
+        console.log('总体相似度:', overall);
+        
+        return {
+            overall,
+            mfcc: mfccSimilarity,
+            spectral: spectralSimilarity,
+            temporal: temporalSimilarity
+        };
+    }
+    
+    /**
+     * 计算MFCC相似度
+     * @param {Array} mfccA - 第一组MFCC
+     * @param {Array} mfccB - 第二组MFCC
+     * @returns {number} 相似度
+     */
+    calculateMFCCSimilarity(mfccA, mfccB) {
+        if (!mfccA || !mfccB || !Array.isArray(mfccA) || !Array.isArray(mfccB)) {
+            console.warn('无效的MFCC数据');
+            return 0;
+        }
+        
+        if (mfccA.length !== mfccB.length) {
+            console.warn('MFCC维度不匹配:', {
+                mfccALength: mfccA.length,
+                mfccBLength: mfccB.length
+            });
+            return 0;
+        }
+        
+        const differences = mfccA.map((coef, i) => Math.abs(coef - mfccB[i]));
+        const maxDifference = Math.max(...differences);
+        
+        if (maxDifference === 0) return 1;
+        
+        const normalizedDifferences = differences.map(diff => 1 - (diff / maxDifference));
+        return normalizedDifferences.reduce((sum, val) => sum + val, 0) / differences.length;
+    }
+    
+    /**
+     * 计算频谱特征相似度
+     * @param {Object} featuresA - 第一组特征
+     * @param {Object} featuresB - 第二组特征
+     * @returns {number} 相似度
+     */
+    calculateSpectralSimilarity(featuresA, featuresB) {
+        const features = [
+            'spectralCentroid',
+            'spectralRolloff',
+            'spectralFlatness',
+            'spectralSpread'
+        ];
+        
+        const similarities = features.map(feature => {
+            const valueA = featuresA[feature];
+            const valueB = featuresB[feature];
             
-            if (validFeatures.length === 0) {
-                console.warn(`没有有效的 ${feature} 特征`);
+            if (valueA === undefined || valueB === undefined || 
+                isNaN(valueA) || isNaN(valueB)) {
+                console.warn(`无效的${feature}数据:`, { valueA, valueB });
                 return 0;
             }
             
-            const sum = validFeatures.reduce((acc, frame) => acc + frame[feature], 0);
-            return sum / validFeatures.length;
-        } catch (error) {
-            console.error(`${feature} 平均值计算错误:`, error);
-            return 0;
-        }
+            const diff = Math.abs(valueA - valueB);
+            const max = Math.max(Math.abs(valueA), Math.abs(valueB));
+            
+            return max === 0 ? 1 : 1 - (diff / max);
+        });
+        
+        return similarities.reduce((sum, val) => sum + val, 0) / similarities.length;
     }
     
     /**
-     * 计算两组特征之间的相似度
-     * @param {Object} features1 - 第一个音频的特征
-     * @param {Object} features2 - 第二个音频的特征
-     * @returns {Object} 相似度分析结果
+     * 计算时域特征相似度
+     * @param {Object} featuresA - 第一组特征
+     * @param {Object} featuresB - 第二组特征
+     * @returns {number} 相似度
      */
-    compareFeatures(features1, features2) {
-        try {
-            console.log('开始计算特征相似度');
+    calculateTemporalSimilarity(featuresA, featuresB) {
+        const features = ['rms', 'zcr', 'loudnessValue'];
+        
+        const similarities = features.map(feature => {
+            const valueA = featuresA[feature];
+            const valueB = featuresB[feature];
             
-            const similarity = {
-                mfcc: this.calculateMFCCSimilarity(features1.mfcc, features2.mfcc),
-                spectral: this.calculateSpectralSimilarity(features1, features2),
-                temporal: this.calculateTemporalSimilarity(features1, features2),
-                perceptual: this.calculatePerceptualSimilarity(features1, features2),
-                overall: 0
-            };
-            
-            // 计算总体相似度（加权平均）
-            similarity.overall = (
-                similarity.mfcc * 0.4 +       // MFCC 特征权重
-                similarity.spectral * 0.3 +    // 频谱特征权重
-                similarity.temporal * 0.2 +    // 时域特征权重
-                similarity.perceptual * 0.1    // 感知特征权重
-            );
-            
-            console.log('相似度计算结果:', similarity);
-            return similarity;
-        } catch (error) {
-            console.error('特征比较错误:', error);
-            return {
-                mfcc: 0,
-                spectral: 0,
-                temporal: 0,
-                perceptual: 0,
-                overall: 0
-            };
-        }
-    }
-    
-    /**
-     * 计算感知特征的相似度
-     */
-    calculatePerceptualSimilarity(features1, features2) {
-        try {
-            const perceptualFeatures = ['perceptualSpread', 'perceptualSharpness', 'loudnessValue'];
-            let totalDiff = 0;
-            let validFeatures = 0;
-            
-            perceptualFeatures.forEach(feature => {
-                if (features1[feature] !== undefined && features2[feature] !== undefined &&
-                    !isNaN(features1[feature]) && !isNaN(features2[feature]) &&
-                    features1[feature] !== 0 && features2[feature] !== 0) {
-                    const diff = Math.abs(features1[feature] - features2[feature]);
-                    const normalizedDiff = diff / Math.max(features1[feature], features2[feature]);
-                    totalDiff += normalizedDiff;
-                    validFeatures++;
-                }
-            });
-            
-            return validFeatures > 0 ? 1 - (totalDiff / validFeatures) : 0;
-        } catch (error) {
-            console.error('感知特征相似度计算错误:', error);
-            return 0;
-        }
-    }
-    
-    /**
-     * 计算 MFCC 特征的相似度
-     */
-    calculateMFCCSimilarity(mfcc1, mfcc2) {
-        try {
-            if (!Array.isArray(mfcc1) || !Array.isArray(mfcc2)) {
-                console.warn('MFCC 数据无效');
+            if (valueA === undefined || valueB === undefined || 
+                isNaN(valueA) || isNaN(valueB)) {
+                console.warn(`无效的${feature}数据:`, { valueA, valueB });
                 return 0;
             }
             
-            const length = Math.min(mfcc1.length, mfcc2.length);
-            if (length === 0) return 0;
+            const diff = Math.abs(valueA - valueB);
+            const max = Math.max(Math.abs(valueA), Math.abs(valueB));
             
-            const squaredDiffs = [];
-            for (let i = 0; i < length; i++) {
-                if (!isNaN(mfcc1[i]) && !isNaN(mfcc2[i])) {
-                    const diff = mfcc1[i] - mfcc2[i];
-                    squaredDiffs.push(diff * diff);
-                }
-            }
-            
-            if (squaredDiffs.length === 0) return 0;
-            
-            const mse = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / squaredDiffs.length;
-            return 1 / (1 + Math.sqrt(mse)); // 转换为 0-1 范围的相似度
-        } catch (error) {
-            console.error('MFCC 相似度计算错误:', error);
-            return 0;
-        }
-    }
-    
-    /**
-     * 计算频谱特征的相似度
-     */
-    calculateSpectralSimilarity(features1, features2) {
-        try {
-            const spectralFeatures = ['spectralCentroid', 'spectralRolloff', 'spectralFlatness', 'spectralSpread'];
-            let totalDiff = 0;
-            let validFeatures = 0;
-            
-            spectralFeatures.forEach(feature => {
-                if (features1[feature] !== undefined && features2[feature] !== undefined &&
-                    !isNaN(features1[feature]) && !isNaN(features2[feature]) &&
-                    features1[feature] !== 0 && features2[feature] !== 0) {
-                    const diff = Math.abs(features1[feature] - features2[feature]);
-                    const normalizedDiff = diff / Math.max(features1[feature], features2[feature]);
-                    totalDiff += normalizedDiff;
-                    validFeatures++;
-                }
-            });
-            
-            return validFeatures > 0 ? 1 - (totalDiff / validFeatures) : 0;
-        } catch (error) {
-            console.error('频谱相似度计算错误:', error);
-            return 0;
-        }
-    }
-    
-    /**
-     * 计算时域特征的相似度
-     */
-    calculateTemporalSimilarity(features1, features2) {
-        try {
-            const temporalFeatures = ['rms', 'zcr', 'energy'];
-            let totalDiff = 0;
-            let validFeatures = 0;
-            
-            temporalFeatures.forEach(feature => {
-                if (features1[feature] !== undefined && features2[feature] !== undefined &&
-                    !isNaN(features1[feature]) && !isNaN(features2[feature]) &&
-                    features1[feature] !== 0 && features2[feature] !== 0) {
-                    const diff = Math.abs(features1[feature] - features2[feature]);
-                    const normalizedDiff = diff / Math.max(features1[feature], features2[feature]);
-                    totalDiff += normalizedDiff;
-                    validFeatures++;
-                }
-            });
-            
-            return validFeatures > 0 ? 1 - (totalDiff / validFeatures) : 0;
-        } catch (error) {
-            console.error('时域相似度计算错误:', error);
-            return 0;
-        }
+            return max === 0 ? 1 : 1 - (diff / max);
+        });
+        
+        return similarities.reduce((sum, val) => sum + val, 0) / similarities.length;
     }
 } 

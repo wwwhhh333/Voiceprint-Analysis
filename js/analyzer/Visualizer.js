@@ -5,6 +5,7 @@ export class Visualizer {
         this.audioAnalyzer = audioAnalyzer;
         this.suffix = suffix;
         this.showSpectrogram = showSpectrogram;
+        this.isAnimating = false;
         this.setupCanvases();
     }
 
@@ -25,11 +26,39 @@ export class Visualizer {
     }
 
     resizeCanvas(canvas) {
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
+        // 获取容器的实际大小
+        const container = canvas.parentElement;
+        const rect = container.getBoundingClientRect();
+        
+        // 设置canvas的大小
+        canvas.width = rect.width - 32; // 减去padding
+        canvas.height = rect.height - 32;
+        
+        // 清除画布
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'rgb(248, 246, 241)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    draw() { //绘制波形和频谱图
+    start() {
+        if (!this.isAnimating) {
+            this.isAnimating = true;
+            this.animate();
+        }
+    }
+
+    stop() {
+        this.isAnimating = false;
+    }
+
+    animate() {
+        if (!this.isAnimating) return;
+
+        this.draw();
+        requestAnimationFrame(() => this.animate());
+    }
+
+    draw() {
         if (this.waveformCanvas) {
             this.drawWaveform();
         }
@@ -38,14 +67,18 @@ export class Visualizer {
         }
     }
 
-    drawWaveform() { //绘制波形
+    drawWaveform() {
         const dataArray = this.audioAnalyzer.getWaveformData();
+        if (!dataArray || !this.waveformCtx) return;
+
         const width = this.waveformCanvas.width;
         const height = this.waveformCanvas.height;
         
+        // 清除画布
         this.waveformCtx.fillStyle = 'rgb(248, 246, 241)';
         this.waveformCtx.fillRect(0, 0, width, height);
         
+        // 设置波形样式
         this.waveformCtx.lineWidth = 2;
         this.waveformCtx.strokeStyle = 'rgb(51, 51, 51)';
         this.waveformCtx.beginPath();
@@ -53,6 +86,7 @@ export class Visualizer {
         const sliceWidth = width / dataArray.length;
         let x = 0;
         
+        // 绘制波形
         dataArray.forEach((value, i) => {
             const y = (value * 0.5 * height/2) + height/2;
             if (i === 0) {
@@ -67,14 +101,18 @@ export class Visualizer {
         this.waveformCtx.stroke();
     }
 
-    drawSpectrogram() { //绘制频谱图
+    drawSpectrogram() {
         const dataArray = this.audioAnalyzer.getFrequencyData();
+        if (!dataArray || !this.spectrogramCtx) return;
+
         const width = this.spectrogramCanvas.width;
         const height = this.spectrogramCanvas.height;
         
+        // 清除画布
         this.spectrogramCtx.fillStyle = 'rgb(248, 246, 241)';
         this.spectrogramCtx.fillRect(0, 0, width, height);
         
+        // 绘制频谱
         const barWidth = (width / dataArray.length) * 2.5;
         let x = 0;
         
