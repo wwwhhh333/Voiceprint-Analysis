@@ -87,77 +87,72 @@
             <div class="result-panel" style="display: none;">
                 <div class="result-header">
                     <button id="backBtn" class="back-btn">返回</button>
-                    <h3>声纹分析报告</h3>
+                    <h2>声纹分析报告</h2>
                 </div>
 
                 <div class="results">
-                    <div class="result-group">
-                        <div class="overall-similarity">
-                            <div class="similarity-score">
-                                <div class="tooltip">
-                                    <div class="score-value" id="overallScore">0%</div>
-                                    <span class="tooltip-text">
-                                        总体相似度是基于多个声纹特征的综合评分。
-                                        <br><br>
-                                        参考标准：
-                                        <br>- 极高相似：<span class="value">90-100%</span>
-                                        <br>- 高度相似：<span class="value">80-90%</span>
-                                        <br>- 中等相似：<span class="value">60-80%</span>
-                                        <br>- 低度相似：<span class="value">40-60%</span>
-                                        <br>- 差异显著：<span class="value">0-40%</span>
+                    <div class="result-group overall-similarity">
+                        <div class="similarity-score">
+                            <div class="score-value" id="totalSimilarity">-</div>
+                            <div class="score-label">总体相似度</div>
+                        </div>
+                        
+                        <div class="similarity-details">
+                            <div class="detail-item">
+                                <span class="detail-label">
+                                    <span class="tooltip">
+                                        音色特征
+                                        <div class="tooltip-text">
+                                            音色特征是声音的固有特性，反映声道结构和发声方式。
+                                            <br><br>
+                                            包含特征：
+                                            <br>- 谐波结构：<span class="value">35%</span>
+                                            <br>- 频谱包络：<span class="value">35%</span>
+                                            <br>- 音色特征：<span class="value">30%</span>
+                                        </div>
                                     </span>
-                                </div>
-                                <div class="score-label">总体相似度</div>
+                                </span>
+                                <span class="detail-value" id="timbreSimilarity">-</span>
                             </div>
-                            <div class="similarity-details">
-                                <div class="detail-item">
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">
                                     <span class="tooltip">
-                                        <span class="detail-value" id="timbreScore">0%</span>
-                                        <span class="tooltip-text">
-                                            音色相似度基于谐波结构、频谱包络等特征的对比。
+                                        声学特征
+                                        <div class="tooltip-text">
+                                            声学特征是语音信号的物理特性。
                                             <br><br>
-                                            评分标准：
-                                            <br>- 谐波结构匹配度：<span class="value">40%权重</span>
-                                            <br>- 频谱包络相似度：<span class="value">40%权重</span>
-                                            <br>- 音色特征匹配：<span class="value">20%权重</span>
-                                        </span>
+                                            包含特征：
+                                            <br>- 基频特征：<span class="value">35%</span>
+                                            <br>- 能量特征：<span class="value">35%</span>
+                                            <br>- 共振特征：<span class="value">30%</span>
+                                        </div>
                                     </span>
-                                    <span class="detail-label">音色相似度</span>
-                                </div>
-                                <div class="detail-item">
+                                </span>
+                                <span class="detail-value" id="acousticSimilarity">-</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-label">
                                     <span class="tooltip">
-                                        <span class="detail-value" id="pitchScore">0%</span>
-                                        <span class="tooltip-text">
-                                            音高相似度比较两段语音的基频特征。
+                                        节奏特征
+                                        <div class="tooltip-text">
+                                            节奏特征反映语音的时序模式。
                                             <br><br>
-                                            考虑因素：
-                                            <br>- 基频范围：<span class="value">30%权重</span>
-                                            <br>- 音高变化曲线：<span class="value">40%权重</span>
-                                            <br>- 音高稳定性：<span class="value">30%权重</span>
-                                        </span>
+                                            包含特征：
+                                            <br>- 语速：<span class="value">35%</span>
+                                            <br>- 节奏：<span class="value">35%</span>
+                                            <br>- 时长：<span class="value">30%</span>
+                                        </div>
                                     </span>
-                                    <span class="detail-label">音高相似度</span>
-                                </div>
-                                <div class="detail-item">
-                                    <span class="tooltip">
-                                        <span class="detail-value" id="rhythmScore">0%</span>
-                                        <span class="tooltip-text">
-                                            节奏相似度分析语音的时序特征。
-                                            <br><br>
-                                            评估指标：
-                                            <br>- 语速匹配：<span class="value">35%权重</span>
-                                            <br>- 停顿模式：<span class="value">35%权重</span>
-                                            <br>- 重音分布：<span class="value">30%权重</span>
-                                        </span>
-                                    </span>
-                                    <span class="detail-label">节奏相似度</span>
-                                </div>
+                                </span>
+                                <span class="detail-value" id="rhythmSimilarity">-</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="result-group">
-                        <h3>声纹特征对比</h3>
+                        <h3>特征详细对比</h3>
                         <div class="features-comparison">
                             <div class="analysis-section">
                                 <h4>音色特征对比</h4>
@@ -165,44 +160,27 @@
                                     <div class="data-item">
                                         <span class="tooltip">
                                             谐波结构
-                                            <span class="tooltip-text">
-                                                谐波结构反映声音的泛音分布特征。
-                                                <br><br>
-                                                匹配度评估：
-                                                <br>- 优秀：<span class="value">≥90%</span>
-                                                <br>- 良好：<span class="value">70-90%</span>
-                                                <br>- 一般：<span class="value">50-70%</span>
-                                                <br>- 差异：<span class="value">＜50%</span>
-                                            </span>
+                                            <div class="tooltip-text">
+                                                谐波结构反映了声音的基本组成特征。
+                                            </div>
                                         </span>
                                         <span id="harmonicsMatch">0%</span>
                                     </div>
                                     <div class="data-item">
                                         <span class="tooltip">
                                             频谱包络
-                                            <span class="tooltip-text">
-                                                频谱包络描述声音的能量分布特征。
-                                                <br><br>
-                                                相似度标准：
-                                                <br>- 高度匹配：<span class="value">≥85%</span>
-                                                <br>- 较好匹配：<span class="value">70-85%</span>
-                                                <br>- 部分匹配：<span class="value">50-70%</span>
-                                                <br>- 显著差异：<span class="value">＜50%</span>
-                                            </span>
+                                            <div class="tooltip-text">
+                                                频谱包络描述了声音能量的频率分布特征。
+                                            </div>
                                         </span>
                                         <span id="spectralMatch">0%</span>
                                     </div>
                                     <div class="data-item">
                                         <span class="tooltip">
                                             音色特征
-                                            <span class="tooltip-text">
-                                                音色特征包括明亮度、粗糙度等感知特性。
-                                                <br><br>
-                                                评分参考：
-                                                <br>- 明亮度差异：<span class="value">30%权重</span>
-                                                <br>- 粗糙度差异：<span class="value">35%权重</span>
-                                                <br>- 音色纯度：<span class="value">35%权重</span>
-                                            </span>
+                                            <div class="tooltip-text">
+                                                音色特征反映了声音的感知属性。
+                                            </div>
                                         </span>
                                         <span id="timbreMatch">0%</span>
                                     </div>
@@ -215,44 +193,62 @@
                                     <div class="data-item">
                                         <span class="tooltip">
                                             基频范围
-                                            <span class="tooltip-text">
-                                                基频范围比较两段语音的音高变化范围。
-                                                <br><br>
-                                                评估标准：
-                                                <br>- 范围重叠：<span class="value">40%权重</span>
-                                                <br>- 中心频率：<span class="value">30%权重</span>
-                                                <br>- 变化幅度：<span class="value">30%权重</span>
-                                            </span>
+                                            <div class="tooltip-text">
+                                                基频范围反映了说话人的音高特征。
+                                            </div>
                                         </span>
                                         <span id="pitchRangeMatch">0%</span>
                                     </div>
                                     <div class="data-item">
                                         <span class="tooltip">
                                             能量分布
-                                            <span class="tooltip-text">
-                                                能量分布反映声音在不同频段的能量占比。
-                                                <br><br>
-                                                匹配度计算：
-                                                <br>- 低频段(0-500Hz)：<span class="value">35%权重</span>
-                                                <br>- 中频段(500-2kHz)：<span class="value">40%权重</span>
-                                                <br>- 高频段(2k+Hz)：<span class="value">25%权重</span>
-                                            </span>
+                                            <div class="tooltip-text">
+                                                能量分布反映了声音的响度特征。
+                                            </div>
                                         </span>
                                         <span id="energyMatch">0%</span>
                                     </div>
                                     <div class="data-item">
                                         <span class="tooltip">
                                             共振峰
-                                            <span class="tooltip-text">
-                                                共振峰特征反映声道特性，是说话人识别的重要依据。
-                                                <br><br>
-                                                对比维度：
-                                                <br>- F1(第一共振峰)：<span class="value">40%权重</span>
-                                                <br>- F2(第二共振峰)：<span class="value">35%权重</span>
-                                                <br>- F3(第三共振峰)：<span class="value">25%权重</span>
-                                            </span>
+                                            <div class="tooltip-text">
+                                                共振峰反映了声道的声学特性。
+                                            </div>
                                         </span>
                                         <span id="formantMatch">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="analysis-section">
+                                <h4>节奏特征对比</h4>
+                                <div class="data-grid">
+                                    <div class="data-item">
+                                        <span class="tooltip">
+                                            语速匹配度
+                                            <div class="tooltip-text">
+                                                语速匹配度反映了说话速率的相似程度。
+                                            </div>
+                                        </span>
+                                        <span id="speedMatch">0%</span>
+                                    </div>
+                                    <div class="data-item">
+                                        <span class="tooltip">
+                                            节奏模式匹配度
+                                            <div class="tooltip-text">
+                                                节奏模式反映了语音的韵律特征。
+                                            </div>
+                                        </span>
+                                        <span id="rhythmMatch">0%</span>
+                                    </div>
+                                    <div class="data-item">
+                                        <span class="tooltip">
+                                            时长比例
+                                            <div class="tooltip-text">
+                                                时长比例反映了语音的持续时间特征。
+                                            </div>
+                                        </span>
+                                        <span id="durationRatio">0%</span>
                                     </div>
                                 </div>
                             </div>
@@ -262,7 +258,6 @@
                     <div class="result-group">
                         <h3>分析结论</h3>
                         <div class="conclusion">
-                            <h4>声纹对比结果</h4>
                             <p id="conclusionText" class="status">等待分析...</p>
                         </div>
                     </div>

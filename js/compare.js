@@ -213,23 +213,26 @@ class VoiceprintCompareSystem {
             console.log('结果数据:', JSON.stringify(results, null, 2));
             
             // 更新总体相似度
-            const overallScore = Math.round((results.similarity || 0) * 100);
-            const timbreScore = Math.round((results.timbreMatch || 0) * 100);
-            const pitchScore = Math.round((results.pitchMatch || 0) * 100);
-            const rhythmScore = Math.round((results.rhythmMatch || 0) * 100);
+            document.getElementById('totalSimilarity').textContent = 
+                `${Math.round(results.totalSimilarity * 100)}%`;
             
-            console.log('相似度评分:', {
-                overallScore,
-                timbreScore,
-                pitchScore,
-                rhythmScore
-            });
+            // 更新三个主要相似度指标
+            document.getElementById('timbreSimilarity').textContent = 
+                `${Math.round(results.timbreSimilarity * 100)}%`;
+            document.getElementById('acousticSimilarity').textContent = 
+                `${Math.round(results.acousticSimilarity * 100)}%`;
+            document.getElementById('rhythmSimilarity').textContent = 
+                `${Math.round(results.rhythmSimilarity * 100)}%`;
             
-            // 更新总体评分
-            document.getElementById('overallScore').textContent = `${overallScore}%`;
-            document.getElementById('timbreScore').textContent = `${timbreScore}%`;
-            document.getElementById('pitchScore').textContent = `${pitchScore}%`;
-            document.getElementById('rhythmScore').textContent = `${rhythmScore}%`;
+            // 更新节奏特征的详细指标
+            if (results.rhythmFeatures) {
+                document.getElementById('speedMatch').textContent = 
+                    `${Math.round(results.rhythmFeatures.speedMatch * 100)}%`;
+                document.getElementById('rhythmMatch').textContent = 
+                    `${Math.round(results.rhythmFeatures.rhythmMatch * 100)}%`;
+                document.getElementById('durationRatio').textContent = 
+                    `${Math.round(results.rhythmFeatures.durationRatio * 100)}%`;
+            }
 
             // 更新详细特征匹配度
             const details = results.details || {};
@@ -255,14 +258,14 @@ class VoiceprintCompareSystem {
 
             // 生成分析结论
             let conclusion = '';
-            const similarityLevel = this.getSimilarityLevel(overallScore);
-            conclusion = `两段语音的总体相似度为 ${overallScore}%，${similarityLevel}。\n\n`;
+            const similarityLevel = this.getSimilarityLevel(Math.round(results.totalSimilarity * 100));
+            conclusion = `两段语音的总体相似度为 ${Math.round(results.totalSimilarity * 100)}%，${similarityLevel}。\n\n`;
             
             // 添加详细分析
             conclusion += `详细分析：\n`;
-            conclusion += `• 音色相似度：${timbreScore}%\n`;
-            conclusion += `• 音高相似度：${pitchScore}%\n`;
-            conclusion += `• 节奏相似度：${rhythmScore}%\n\n`;
+            conclusion += `• 音色相似度：${Math.round(results.timbreSimilarity * 100)}%\n`;
+            conclusion += `• 声学特征相似度：${Math.round(results.acousticSimilarity * 100)}%\n`;
+            conclusion += `• 节奏相似度：${Math.round(results.rhythmSimilarity * 100)}%\n\n`;
             
             // 添加主要差异和相似点
             const strengths = [];
@@ -282,12 +285,12 @@ class VoiceprintCompareSystem {
             if (timbreFeatureScore >= 80) strengths.push('音色特征高度匹配');
             else if (timbreFeatureScore < 60) weaknesses.push('音色特征存在差异');
             
-            // 音高和节奏特征分析
-            if (pitchScore >= 80) strengths.push('音高特征高度匹配');
-            else if (pitchScore < 60) weaknesses.push('音高特征存在明显差异');
+            // 声学和节奏特征分析
+            if (results.acousticSimilarity >= 0.8) strengths.push('声学特征高度匹配');
+            else if (results.acousticSimilarity < 0.6) weaknesses.push('声学特征存在明显差异');
             
-            if (rhythmScore >= 80) strengths.push('节奏特征高度匹配');
-            else if (rhythmScore < 60) weaknesses.push('节奏特征存在明显差异');
+            if (results.rhythmSimilarity >= 0.8) strengths.push('节奏特征高度匹配');
+            else if (results.rhythmSimilarity < 0.6) weaknesses.push('节奏特征存在明显差异');
             
             if (weaknesses.length > 0) {
                 conclusion += `主要差异：\n• ${weaknesses.join('\n• ')}\n\n`;

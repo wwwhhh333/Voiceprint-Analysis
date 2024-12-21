@@ -87,12 +87,45 @@ export class CompareAnalyzer {
             // 计算节奏相似度
             const rhythmMatch = this.calculateRhythmMatch(featuresA, featuresB);
             
+            // 计算语速匹配度
+            const speedMatch = this.calculateSpeedMatch(featuresA, featuresB);
+            
+            // 计算时长比例
+            const durationRatio = this.calculateDurationRatio(audioBufferA.duration, audioBufferB.duration);
+            
+            // 计算综合节奏相似度
+            const rhythmSimilarity = (speedMatch * 0.4 + rhythmMatch * 0.4 + durationRatio * 0.2);
+            
+            // 计算音色相似度
+            const timbreSimilarity = this.normalizeValue(similarity.spectral);
+            
+            // 计算声学特征相似度
+            const acousticSimilarity = this.normalizeValue(
+                (similarity.mfcc * 0.4 + similarity.spectral * 0.3 + pitchMatch * 0.3)
+            );
+            
+            // 计算总体相似度
+            const totalSimilarity = this.normalizeValue(
+                timbreSimilarity * 0.4 + 
+                acousticSimilarity * 0.3 + 
+                rhythmSimilarity * 0.3
+            );
+
             // 构建详细的对比结果
             const result = {
-                similarity: this.normalizeValue(similarity.overall),
-                timbreMatch: this.normalizeValue(similarity.spectral),
-                pitchMatch: this.normalizeValue(pitchMatch),
-                rhythmMatch: this.normalizeValue(rhythmMatch),
+                totalSimilarity,
+                timbreSimilarity,
+                acousticSimilarity,
+                rhythmSimilarity,
+                similarity: totalSimilarity, // 为了兼容旧的结构
+                timbreMatch: timbreSimilarity,
+                pitchMatch: pitchMatch,
+                rhythmMatch: rhythmMatch,
+                rhythmFeatures: {
+                    speedMatch,
+                    rhythmMatch,
+                    durationRatio
+                },
                 details: {
                     timbreFeatures: {
                         harmonicsMatch: this.normalizeValue(similarity.mfcc),
@@ -113,7 +146,7 @@ export class CompareAnalyzer {
                 }
             };
             
-            console.log('对比分析完成');
+            console.log('对比分析完成，结果：', result);
             return result;
             
         } catch (error) {
@@ -333,5 +366,112 @@ export class CompareAnalyzer {
             f2Match * formantFactors.f2 +
             f3Match * formantFactors.f3
         );
+    }
+
+    calculateSpeedMatch(featuresA, featuresB) {
+        try {
+            // 计算语速匹配度
+            const speedA = this.calculateAverageSpeechRate(featuresA);
+            const speedB = this.calculateAverageSpeechRate(featuresB);
+            
+            if (speedA === 0 && speedB === 0) return 1;
+            if (speedA === 0 || speedB === 0) return 0;
+            
+            // 计算语速比例，确保结果在0-1之间
+            const ratio = Math.min(speedA, speedB) / Math.max(speedA, speedB);
+            return this.normalizeValue(ratio);
+        } catch (error) {
+            console.error('计算语速匹配度时出错:', error);
+            return 0;
+        }
+    }
+
+    calculateAverageSpeechRate(features) {
+        try {
+            if (!features || !features.statistics) {
+                console.warn('特征数据不完整');
+                return 0;
+            }
+
+            const stats = features.statistics;
+            let speedValue = 0;
+            let validFactors = 0;
+
+            // 使用过零率均值
+            if (stats.zcr && typeof stats.zcr.mean === 'number') {
+                speedValue += stats.zcr.mean * 0.6;
+                validFactors += 0.6;
+            }
+
+            // 使用RMS能量均值
+            if (stats.rms && typeof stats.rms.mean === 'number') {
+                speedValue += stats.rms.mean * 0.4;
+                validFactors += 0.4;
+            }
+
+            // 如果没有有效数据，返回默认值
+            if (validFactors === 0) {
+                console.warn('无有效的语速特征数据');
+                return 0;
+            }
+
+            // 归一化结果
+            return speedValue / validFactors;
+        } catch (error) {
+            console.error('计算平均语速时出错:', error);
+            return 0;
+        }
+    }
+
+    calculateDurationRatio(durationA, durationB) {
+        // 计算时长比例，确保结果在0-1之间
+        return Math.min(durationA, durationB) / Math.max(durationA, durationB);
+    }
+
+    extractRhythmPattern(features) {
+        // 使用能量变化来提取节奏模式
+        const rms = features.rms || [];
+        if (rms.length === 0) return [];
+        
+        // 计算能量变化率
+        const pattern = [];
+        for (let i = 1; i < rms.length; i++) {
+            pattern.push(rms[i] - rms[i-1]);
+        }
+        
+        return pattern;
+    }
+
+    comparePatterns(patternA, patternB) {
+        if (patternA.length === 0 || patternB.length === 0) {
+            return 0;
+        }
+        
+        // 将两个模式归一化到相同长度
+        const length = Math.min(patternA.length, patternB.length);
+        const normalizedA = this.normalizePattern(patternA, length);
+        const normalizedB = this.normalizePattern(patternB, length);
+        
+        // 计算相关系数
+        let similarity = 0;
+        for (let i = 0; i < length; i++) {
+            similarity += 1 - Math.abs(normalizedA[i] - normalizedB[i]);
+        }
+        
+        return similarity / length;
+    }
+
+    normalizePattern(pattern, targetLength) {
+        if (pattern.length === targetLength) return pattern;
+        
+        const normalized = new Array(targetLength);
+        const ratio = pattern.length / targetLength;
+        
+        for (let i = 0; i < targetLength; i++) {
+            const pos = Math.floor(i * ratio);
+            normalized[i] = pattern[pos];
+        }
+        
+        return normalized;
     }
 } 
