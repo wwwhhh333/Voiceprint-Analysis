@@ -257,53 +257,39 @@ class VoiceprintCompareSystem {
                 `${Math.round((details.formantMatch || 0) * 100)}%`;
 
             // 生成分析结论
-            let conclusion = '';
-            const similarityLevel = this.getSimilarityLevel(Math.round(results.totalSimilarity * 100));
-            conclusion = `两段语音的总体相似度为 ${Math.round(results.totalSimilarity * 100)}%，${similarityLevel}。\n\n`;
+            const totalSimilarity = Math.round(results.totalSimilarity * 100);
+            const timbreSimilarity = Math.round(results.timbreSimilarity * 100);
+            const acousticSimilarity = Math.round(results.acousticSimilarity * 100);
+            const rhythmSimilarity = Math.round(results.rhythmSimilarity * 100);
+
+            let conclusionText = `基于声纹分析系统的综合评估，两段语音的总体相似度为 <span class="highlight">${totalSimilarity}%</span>。\n\n`;
             
-            // 添加详细分析
-            conclusion += `详细分析：\n`;
-            conclusion += `• 音色相似度：${Math.round(results.timbreSimilarity * 100)}%\n`;
-            conclusion += `• 声学特征相似度：${Math.round(results.acousticSimilarity * 100)}%\n`;
-            conclusion += `• 节奏相似度：${Math.round(results.rhythmSimilarity * 100)}%\n\n`;
+            conclusionText += '<div class="section">声学特征分析：\n';
+            conclusionText += `音色特征相似度为 <span class="highlight">${timbreSimilarity}%</span>，`;
+            conclusionText += `声学特征相似度为 <span class="highlight">${acousticSimilarity}%</span>，`;
+            conclusionText += `节奏特征相似度为 <span class="highlight">${rhythmSimilarity}%</span>。</div>\n\n`;
             
-            // 添加主要差异和相似点
-            const strengths = [];
-            const weaknesses = [];
-            
-            // 音色特征分析
-            const harmonicsScore = Math.round((timbreFeatures.harmonicsMatch || 0) * 100);
-            const spectralScore = Math.round((timbreFeatures.spectralMatch || 0) * 100);
-            const timbreFeatureScore = Math.round((timbreFeatures.timbreFeatureMatch || 0) * 100);
-            
-            if (harmonicsScore >= 80) strengths.push('谐波结构高度匹配');
-            else if (harmonicsScore < 60) weaknesses.push('谐波结构存在差异');
-            
-            if (spectralScore >= 80) strengths.push('频谱特征高度匹配');
-            else if (spectralScore < 60) weaknesses.push('频谱特征存在差异');
-            
-            if (timbreFeatureScore >= 80) strengths.push('音色特征高度匹配');
-            else if (timbreFeatureScore < 60) weaknesses.push('音色特征存在差异');
-            
-            // 声学和节奏特征分析
-            if (results.acousticSimilarity >= 0.8) strengths.push('声学特征高度匹配');
-            else if (results.acousticSimilarity < 0.6) weaknesses.push('声学特征存在明显差异');
-            
-            if (results.rhythmSimilarity >= 0.8) strengths.push('节奏特征高度匹配');
-            else if (results.rhythmSimilarity < 0.6) weaknesses.push('节奏特征存在明显差异');
-            
-            if (weaknesses.length > 0) {
-                conclusion += `主要差异：\n• ${weaknesses.join('\n• ')}\n\n`;
+            // 添加相似度评估结论
+            conclusionText += '<div class="section">相似度评估：\n';
+            if (totalSimilarity >= 90) {
+                conclusionText += '两段语音极其相似，可以认为是同一个说话人。';
+            } else if (totalSimilarity >= 80) {
+                conclusionText += '两段语音非常相似，很可能是同一个说话人。';
+            } else if (totalSimilarity >= 70) {
+                conclusionText += '两段语音具有较高的相似度，可能是同一个说话人。';
+            } else if (totalSimilarity >= 60) {
+                conclusionText += '两段语音存在一定相似性，但不足以确定是否为同一个说话人。';
+            } else {
+                conclusionText += '两段语音差异较大，可能不是同一个说话人。';
             }
-            if (strengths.length > 0) {
-                conclusion += `主要相似点：\n• ${strengths.join('\n• ')}`;
-            }
-            
-            document.getElementById('conclusionText').textContent = conclusion;
+            conclusionText += '</div>';
+
+            // 更新结论文本
+            const conclusionElement = document.getElementById('conclusionText');
+            conclusionElement.innerHTML = conclusionText;
             
         } catch (error) {
             console.error('更新结果显示时出错:', error);
-            console.error(error.stack);
         }
     }
 
@@ -322,7 +308,7 @@ class VoiceprintCompareSystem {
     }
 }
 
-// 初始化应用
+// 初始化��用
 window.addEventListener('load', () => {
     new VoiceprintCompareSystem();
 }); 

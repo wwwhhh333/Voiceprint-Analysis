@@ -1,4 +1,9 @@
-/* 1. 可视化区域基础布局 */
+/* 1. 基础布局 */
+.container {
+    margin-top: 40px;
+}
+
+/* 2. 可视化区域 */
 .visualization {
     display: flex;
     gap: 30px;
@@ -12,7 +17,6 @@
     flex-direction: column;
 }
 
-/* 2. Canvas 相关样式 */
 canvas {
     width: 100%;
     height: 200px;
@@ -75,34 +79,41 @@ canvas:hover {
 }
 
 /* 4. 标题样式 */
-.visual-container h3 {
+h2, h3, h4 {
     color: var(--text-color);
     font-weight: 400;
-    margin-bottom: 15px;
-    font-size: 20px;
 }
 
-.visual-container h4 {
-    color: var(--text-color);
-    font-weight: 400;
+h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+h4 {
+    font-size: 18px;
     margin: 10px 0;
-    font-size: 16px;
 }
 
 /* 5. 对比页面布局 */
 .compare-container {
-    margin-top: 40px;
+    margin: 20px 0 0 0;
     border: 3px solid var(--border-color);
     border-radius: var(--border-radius);
     padding: 25px;
-    margin: 20px 0 0 0;
     background-color: white;
     box-shadow: var(--box-shadow);
     animation: pageEnter 0.4s ease-out;
     transition: box-shadow var(--transition-time) ease;
 }
 
-/* 6. 输入面板布局 */
+/* 6. 音频面板 */
 .input-panel {
     width: 100%;
     display: flex;
@@ -116,7 +127,6 @@ canvas:hover {
     gap: 30px;
 }
 
-/* 7. 音频面板样式 */
 .audio-panel {
     flex: 1;
     min-width: 300px;
@@ -125,13 +135,6 @@ canvas:hover {
     padding: 0 25px 25px 25px;
     background-color: white;
     box-sizing: border-box;
-}
-
-.audio-panel h3 {
-    margin-bottom: 20px;
-    color: var(--text-color);
-    font-weight: 400;
-    font-size: 20px;
 }
 
 .audio-panel .controls {
@@ -173,24 +176,15 @@ canvas:hover {
     font-size: 14px;
 }
 
-.audio-panel .visual-container {
-    margin-top: 20px;
-}
-
-/* 8. 对比按钮样式 */
+/* 7. 按钮样式 */
 .compare-action {
     display: flex;
     justify-content: center;
 }
 
-.compare-btn {
+.compare-btn, .back-btn {
     border: none;
     border-radius: 20px;
-    height: 40px;
-    width: 130px;
-    padding: 0;
-    font-size: 22px;
-    font-weight: 350;
     color: var(--text-color);
     background-color: var(--button-color);
     cursor: pointer;
@@ -200,7 +194,21 @@ canvas:hover {
     justify-content: center;
 }
 
-.compare-btn:hover {
+.compare-btn {
+    height: 40px;
+    width: 130px;
+    font-size: 22px;
+    font-weight: 350;
+}
+
+.back-btn {
+    height: 30px;
+    width: 90px;
+    font-size: 18px;
+    font-weight: 340;
+}
+
+.compare-btn:hover, .back-btn:hover {
     background-color: var(--button-hover-color);
     color: #FFFFFF;
     transform: translateY(-2px);
@@ -213,7 +221,7 @@ canvas:hover {
     transform: none;
 }
 
-/* 9. 结果面板样式 */
+/* 8. 结果面板 */
 .result-panel {
     width: 100%;
 }
@@ -225,275 +233,12 @@ canvas:hover {
     position: relative;
 }
 
-.result-header h2 {
-    flex: 1;
-    margin-left: 20px;
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--text-color);
-}
-
-.back-btn {
-    border: none;
-    border-radius: 20px;
-    height: 30px;
-    width: 90px;
-    padding: 0;
-    font-size: 18px;
-    font-weight: 340;
-    color: var(--text-color);
-    background-color: var(--button-color);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.back-btn:hover {
-    background-color: var(--button-hover-color);
-    color: #FFFFFF;
-    transform: translateY(-2px);
-}
-
-.result-panel .analysis-data {
-    margin-top: 10px;
-    padding: 30px;
-}
-
-/* 10. 特征对比部分 */
-.features-comparison {
-    display: flex;
-    gap: 30px;
-    margin-top: 30px;
-}
-
-.features-comparison .analysis-section {
-    flex: 1;
-    margin-top: 0;
-    padding: 20px;
-    border: 2px solid var(--border-color);
-    border-radius: var(--border-radius);
-    background-color: #FAFAFA;
-    transition: all 0.3s ease;
-}
-
-.features-comparison .analysis-section:hover {
-    border-color: var(--button-hover-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.features-comparison .data-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-}
-
-.features-comparison h4 {
-    text-align: center;
-    margin: 0 20px 20px 20px;
-    color: var(--text-color);
-    font-weight: 400;
-    font-size: 18px;
-}
-
-/* 11. 结论部分 */
-.conclusion {
-    margin-top: 30px;
-    padding: 15px 25px;
-    border: 2px solid var(--border-color);
-    border-radius: var(--border-radius);
-    background-color: white;
-}
-
-.conclusion h4 {
-    margin: 0 0 12px 0;
-    color: var(--text-color);
-    font-weight: 400;
-    font-size: 18px;
-}
-
-.conclusion .status {
-    margin: 0;
-    line-height: 1.5;
-    white-space: pre-line;
-    color: var(--text-color);
-    font-size: 15px;
-}
-
-/* 12. 动画效果 */
-.input-panel, .result-panel {
-    transition: all 0.3s ease;
-}
-
-/* 13. 响应式设计 */
-@media (max-width: 1200px) {
-    .input-panel {
-        flex-direction: column;
-    }
-    
-    .audio-panel {
-        min-width: 100%;
-    }
-    
-    .audio-panels {
-        flex-direction: column;
-    }
-    
-    .features-comparison {
-        flex-direction: column;
-        gap: 40px;
-    }
-}
-
-/* 特征详情样式 */
-.feature-detail {
-    font-size: 12px;
-    color: #666;
-    margin-top: 2px;
-    font-style: italic;
-}
-
-/* 统计分析部分 */
-.statistical-analysis {
-    margin-top: 30px;
-    padding: 20px;
-    border: 2px solid var(--border-color);
-    border-radius: var(--border-radius);
-    background-color: #FAFAFA;
-}
-
-.statistical-analysis h4 {
-    text-align: center;
-    margin: 0 0 20px 0;
-    color: var(--text-color);
-    font-weight: 400;
-    font-size: 18px;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-}
-
-.stats-item {
-    background: white;
-    border: 2px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 15px;
-    transition: all var(--transition-time) ease;
-}
-
-.stats-item:hover {
-    border-color: var(--button-hover-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.stats-header {
-    text-align: center;
-    font-size: 16px;
-    color: var(--text-color);
-    margin-bottom: 15px;
-    font-weight: 500;
-}
-
-.stats-data {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.stats-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 0;
-    border-bottom: 1px dashed var(--border-color);
-}
-
-.stats-row:last-child {
-    border-bottom: none;
-}
-
-.stats-row span:first-child {
-    color: #666;
-    font-size: 14px;
-}
-
-.stats-row span:last-child {
-    color: var(--text-color);
-    font-weight: 500;
-    font-size: 15px;
-}
-
-/* 响应式设计更新 */
-@media (max-width: 1200px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .stats-item {
-        max-width: 100%;
-    }
-
-}
-
-/* 动画效果 */
-.stats-item {
-    animation: fadeInUp 0.5s ease-out;
-    animation-fill-mode: both;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* 为统计项添加交错动画 */
-.stats-item:nth-child(1) { animation-delay: 0.6s; }
-.stats-item:nth-child(2) { animation-delay: 0.7s; }
-.stats-item:nth-child(3) { animation-delay: 0.8s; }
-
-/* 高对比度模式支持 */
-@media (forced-colors: active) {
-    .stats-item {
-        forced-color-adjust: none;
-        border: 1px solid ButtonBorder;
-        background: ButtonFace;
-    }
-    
-    .stats-row {
-        border-bottom-color: ButtonBorder;
-    }
-    
-    .stats-row span,
-    .stats-header,
-    .feature-detail {
-        color: ButtonText;
-    }
-}.results {
+.results {
     background-color: var(--surface-color);
     border-radius: 8px;
     padding: 2rem;
     margin-top: 2rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.results h2 {
-    color: var(--text-color);
-    margin-bottom: 2rem;
-    text-align: center;
-    font-size: 1.8rem;
 }
 
 .result-group {
@@ -504,12 +249,7 @@ canvas:hover {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.result-group h3 {
-    color: var(--text-color);
-    margin-bottom: 1.5rem;
-    font-size: 1.4rem;
-}
-
+/* 9. 相似度显示 */
 .overall-similarity {
     text-align: center;
 }
@@ -536,136 +276,78 @@ canvas:hover {
     gap: 2rem;
 }
 
-.detail-item {
-    text-align: center;
-}
-
-.detail-label {
-    display: block;
-    color: var(--text-color-secondary);
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.detail-value {
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: var(--text-color);
-}
-
-.analysis-section {
-    margin-bottom: 2rem;
-}
-
-.analysis-section h4 {
-    color: var(--text-color);
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.5rem;
-}
-
-.feature-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-}
-
-.feature-item {
-    background-color: var(--surface-color);
-    padding: 1rem;
-    border-radius: 4px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.feature-label {
-    display: block;
-    color: var(--text-color-secondary);
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.feature-value {
-    display: block;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: var(--text-color);
-    margin-bottom: 0.5rem;
-}
-
-.feature-description {
-    display: block;
-    color: var(--text-color-secondary);
-    font-size: 0.8rem;
-    line-height: 1.4;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-}
-
-.stats-group {
-    background-color: var(--surface-color);
-    padding: 1rem;
-    border-radius: 4px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.stats-group h5 {
-    color: var(--text-color);
-    margin-bottom: 1rem;
-    font-size: 1rem;
-    text-align: center;
-}
-
-.stats-item {
+/* 10. 特征对比 */
+.features-comparison {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.8rem;
-    padding: 0.5rem;
-    background-color: var(--surface-color-light);
-    border-radius: 4px;
+    gap: 30px;
+    margin-top: 30px;
 }
 
-.stats-label {
-    color: var(--text-color-secondary);
-    font-size: 0.9rem;
+.features-comparison .analysis-section {
+    flex: 1;
+    margin-top: 0;
+    padding: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: #FAFAFA;
+    transition: all 0.3s ease;
 }
 
-.stats-value {
-    font-weight: bold;
+.features-comparison .analysis-section:hover {
+    border-color: var(--button-hover-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* 分析结论样式 */
+.conclusion {
+    background-color: white;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 25px 30px;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+.conclusion:hover {
+    border-color: var(--button-hover-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.conclusion .status {
+    margin: 0;
+    line-height: 1.8;
+    font-size: 16px;
     color: var(--text-color);
-    font-size: 0.9rem;
+    text-align: justify;
+    letter-spacing: 0.5px;
+    white-space: pre-line;
 }
 
-@media (max-width: 768px) {
-    .results {
-        padding: 1rem;
-    }
-    
-    .similarity-details {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .feature-grid,
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .score-value {
-        font-size: 2.5rem;
-    }
-    
-    .detail-value {
-        font-size: 1.2rem;
-    }
+.conclusion .highlight {
+    color: var(--button-hover-color);
+    font-weight: 500;
 }
 
-/* Tooltip 样式 */
+.conclusion .section {
+    margin: 15px 0;
+    padding-left: 20px;
+    position: relative;
+}
+
+.conclusion .section:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--button-hover-color);
+}
+
+/* 11. Tooltip */
 .tooltip {
     position: relative;
     cursor: help;
@@ -707,39 +389,86 @@ canvas:hover {
     opacity: 1;
 }
 
-/* 确保tooltip不会超出视口 */
-@media (max-width: 768px) {
-    .tooltip .tooltip-text {
-        width: 250px;
-    }
-}
-
-/* 当tooltip靠近屏幕右边时的位置调整 */
-.tooltip.tooltip-left .tooltip-text {
-    left: auto;
-    right: 0;
-    transform: translateX(0);
-}
-
-.tooltip.tooltip-left .tooltip-text::after {
-    left: auto;
-    right: 20px;
-}
-
-/* 当tooltip靠近屏幕左边时的位置调整 */
-.tooltip.tooltip-right .tooltip-text {
-    left: 0;
-    transform: translateX(0);
-}
-
-.tooltip.tooltip-right .tooltip-text::after {
-    left: 20px;
-    margin-left: 0;
-}
-
-/* 强调数值的样式 */
 .tooltip .value {
     color: #ea0000;
     font-weight: 500;
+}
+
+/* 12. 响应式设计 */
+@media (max-width: 1200px) {
+    .input-panel {
+        flex-direction: column;
+    }
+    
+    .audio-panel {
+        min-width: 100%;
+    }
+    
+    .audio-panels {
+        flex-direction: column;
+    }
+    
+    .features-comparison {
+        flex-direction: column;
+        gap: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .results {
+        padding: 1rem;
+    }
+    
+    .similarity-details {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .tooltip .tooltip-text {
+        width: 250px;
+    }
+    
+    .score-value {
+        font-size: 2.5rem;
+    }
+    
+    .detail-value {
+        font-size: 1.2rem;
+    }
+}
+
+/* 13. 动画效果 */
+@keyframes pageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.input-panel, .result-panel {
+    transition: all 0.3s ease;
+}
+
+/* 14. 高对比度模式支持 */
+@media (forced-colors: active) {
+    .stats-item {
+        forced-color-adjust: none;
+        border: 1px solid ButtonBorder;
+        background: ButtonFace;
+    }
+    
+    .stats-row {
+        border-bottom-color: ButtonBorder;
+    }
+    
+    .stats-row span,
+    .stats-header,
+    .feature-detail {
+        color: ButtonText;
+    }
 }
 

@@ -1,3 +1,4 @@
+/* 1. 变量定义 */
 :root {
     --border-color: #B2B2B2AD;
     --text-color: #5B5B5BA6;
@@ -9,33 +10,33 @@
     --transition-time: 0.3s;
 }
 
-/* 基础样式优化 */
+/* 2. 基础样式 */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: #FAFAFA;
     color: var(--text-color);
     line-height: 1.6;
-    min-height: 100vh;  /* 确保最小高度 */
+    min-height: 100vh;
 }
 
 .container {
     max-width: 1300px;
     margin: 0 auto;
     padding: 20px;
-    animation: fadeIn 0.5s ease;  /* 添加页面载入动画 */
+    animation: fadeIn 0.5s ease;
 }
 
-/* 标题样式优化 */
+/* 3. 标题样式 */
 h1 {
     text-align: center;
     margin-bottom: 60px;
     font-size: 40px;
     color: hsl(0, 0%, 0%);
     font-weight: 350;
-    letter-spacing: 0.5px;  /* 增加字间距 */
+    letter-spacing: 0.5px;
 }
 
-/* 导航栏优化 */
+/* 4. 导航栏 */
 .nav-bar {
     margin: 0;
     position: relative;
@@ -67,7 +68,7 @@ h1 {
     background-color: white;
     color: hsl(0, 0%, 0%);
     border-color: var(--border-color);
-    transform: translateY(-2px);  /* 轻微上浮效果 */
+    transform: translateY(-2px);
 }
 
 .nav-item:hover:not(.active) {
@@ -76,13 +77,12 @@ h1 {
     transform: translateY(-2px);
 }
 
-/* 主体容器优化 */
+/* 5. 主体容器 */
 .body-contianer {
-    margin-top: 40px;
+    margin: 20px 10px;
     border: 3px solid var(--border-color);
     border-radius: var(--border-radius);
     padding: 25px;
-    margin: 20px 10px;
     background-color: white;
     box-shadow: var(--box-shadow);
     animation: pageEnter 0.4s ease-out;
@@ -93,28 +93,7 @@ h1 {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
-/* 动画优化 */
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-/* 滚动条美化 */
+/* 6. 滚动条样式 */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -135,7 +114,27 @@ h1 {
     background: var(--button-hover-color);
 }
 
-/* 页面切换动画 */
+/* 7. 动画效果 */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
 @keyframes pageEnter {
     from {
         opacity: 0;
@@ -147,10 +146,42 @@ h1 {
         transform: translateY(0);
         filter: blur(0);
     }
-
 }
 
-/* 页面内容切换动画 */
+@keyframes contentFade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes itemSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes resultEnter {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 8. 动画应用 */
 .visualization,
 .compare-container,
 .audio-panel,
@@ -165,49 +196,12 @@ h1 {
     animation-fill-mode: backwards;
 }
 
-/* 内容淡入动画 */
-@keyframes contentFade {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-}
-
-/* 数据项滑入动画 */
-@keyframes itemSlideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* 结果面板切换动画 */
 .result-panel {
     animation: resultEnter 0.5s ease-out;
     animation-fill-mode: backwards;
 }
 
-@keyframes resultEnter {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* 为不同元素设置不同的动画延迟 */
+/* 9. 动画延迟 */
 .data-item:nth-child(1) { animation-delay: 0.1s; }
 .data-item:nth-child(2) { animation-delay: 0.2s; }
 .data-item:nth-child(3) { animation-delay: 0.3s; }
