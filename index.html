@@ -44,7 +44,26 @@
 
             <div class="visualization">
                 <div class="visual-container">
-                    <h3>波形图</h3>
+                    <div class="visual-header">
+                        <h3>
+                            <span class="tooltip">
+                                实时波形
+                                <span class="tooltip-text">
+                                    波形图显示了声音随时间变化的振幅。
+                                    <br><br>
+                                    特点说明：
+                                    <br>- 振幅越大，声音越响
+                                    <br>- 波形越密集，音调越高
+                                    <br>- 波形越规律，音色越纯净
+                                    <br><br>
+                                    可以通过波形图观察：
+                                    <br>- 声音的响度变化
+                                    <br>- 声音的起伏特征
+                                    <br>- 声音的持续时间
+                                </span>
+                            </span>
+                        </h3>
+                    </div>
                     <canvas id="waveform"></canvas>
                     <div class="analysis-data">
                         <h4>时域特征分析</h4>
@@ -101,7 +120,26 @@
                 </div>
 
                 <div class="visual-container">
-                    <h3>频谱图</h3>
+                    <div class="visual-header">
+                        <h3>
+                            <span class="tooltip">
+                                瞬时频谱
+                                <span class="tooltip-text">
+                                    频谱图展示了声音在不同频率上的能量分布。
+                                    <br><br>
+                                    颜色含义：
+                                    <br>- 红色：能量强
+                                    <br>- 黄色：能量中等
+                                    <br>- 蓝色：能量弱
+                                    <br><br>
+                                    可以观察：
+                                    <br>- 基频位置（最低的强能量频率）
+                                    <br>- 谐波分布（基频的整数倍频率）
+                                    <br>- 共振峰（能量集中的频带）
+                                </span>
+                            </span>
+                        </h3>
+                    </div>
                     <canvas id="spectrogram"></canvas>
                     <div class="analysis-data">
                         <h4>频域特征分析</h4>
@@ -113,9 +151,9 @@
                                         基频代表声音的基本音高，是声带振动的频率。
                                         <br><br>
                                         典型值范围：
-                                        <br>- 男声：<span class="value">85-180 Hz</span>
-                                        <br>- 女声：<span class="value">165-255 Hz</span>
-                                        <br>- 儿童：<span class="value">250-400 Hz</span>
+                                        <br>- 男声：<span class="value">80-180 Hz</span>
+                                        <br>- 女声：<span class="value">150-300 Hz</span>
+                                        <br>- 儿童：<span class="value">200-600 Hz</span>
                                         <br>
                                         基频越高，感知的音高越高。
                                     </span>
@@ -162,7 +200,26 @@
                 </div>
 
                 <div class="visual-container">
-                    <h3>MFCC分析</h3>
+                    <div class="visual-header">
+                        <h3>
+                            <span class="tooltip">
+                                MFCC分析
+                                <span class="tooltip-text">
+                                    MFCC（梅尔频率倒谱系数）反映了声音的音色特征。
+                                    <br><br>
+                                    特点说明：
+                                    <br>- 模拟人耳的听觉特性
+                                    <br>- 低频分辨率高，高频分辨率低
+                                    <br>- 不同说话人的MFCC特征差异明显
+                                    <br><br>
+                                    应用：
+                                    <br>- 说话人识别
+                                    <br>- 语音识别
+                                    <br>- 音色分析
+                                </span>
+                            </span>
+                        </h3>
+                    </div>
                     <canvas id="mfccCanvas"></canvas>
                     <div class="analysis-data">
                         <h4>感知特征分析</h4>
