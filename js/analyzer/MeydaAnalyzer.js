@@ -1,28 +1,25 @@
-/**
- * 使用 Meyda 库进行专业的声纹特征提取
- */
+//使用Meyda库提取音频特征
+
 export class MeydaAnalyzer {
     constructor() {
-        // 设置特征提取参数
         this.features = [
-            'mfcc',
-            'spectralCentroid',
-            'spectralRolloff',
-            'spectralFlatness',
-            'spectralSpread',
-            'perceptualSpread',
-            'perceptualSharpness',
-            'rms',
-            'zcr',
-            'loudness'
+            'mfcc',                 //MFCC
+            'spectralCentroid',     //频谱质心
+            'spectralRolloff',      //频谱滚降
+            'spectralFlatness',     //频谱平坦度
+            'spectralSpread',       //频谱扩散
+            'perceptualSpread',     //感知扩散
+            'perceptualSharpness',  //感知锐度
+            'rms',                  //短时能量
+            'zcr',                  //过零率
+            'loudness'              //响度
         ];
         
-        // 设置MFCC系数数量
-        this.mfccCoefficients = 13;
+       
+        this.mfccCoefficients = 13; //MFCC系数数量
         
-        // 设置帧大小和重叠
-        this.frameSize = 2048;
-        this.hopSize = 1024;
+        this.frameSize = 2048; //帧大小
+        this.hopSize = 1024; //重叠 
     }
     
     /**
@@ -30,7 +27,7 @@ export class MeydaAnalyzer {
      * @param {AudioBuffer} audioBuffer - 音频缓冲区
      * @returns {Object} 提取的特征
      */
-    async extractFeatures(audioBuffer) {
+    async extractFeatures(audioBuffer) { //提取音频特征
         try {
             console.log('开始提取特征...');
             console.log('音频信息:', {
@@ -40,24 +37,20 @@ export class MeydaAnalyzer {
                 length: audioBuffer.length
             });
             
-            // 创建离线音频上下文
             const offlineCtx = new OfflineAudioContext(
                 1,
                 audioBuffer.length,
                 audioBuffer.sampleRate
             );
             
-            // 创建音频源节点
             const sourceNode = offlineCtx.createBufferSource();
             sourceNode.buffer = audioBuffer;
             
-            // 创建脚本处理器节点
             const scriptNode = offlineCtx.createScriptProcessor(this.frameSize, 1, 1);
             
-            // 存储每一帧的特征
-            const frames = [];
+            const frames = []; //存储每一帧的特征
             
-            // 创建Meyda分析器
+            //创建Meyda分析器
             const meydaAnalyzer = Meyda.createMeydaAnalyzer({
                 audioContext: offlineCtx,
                 source: sourceNode,
@@ -68,7 +61,7 @@ export class MeydaAnalyzer {
             
             console.log('Meyda分析器创建完成');
             
-            // 设置音频处理回调
+            //音频处理回调
             return new Promise((resolve, reject) => {
                 scriptNode.onaudioprocess = (e) => {
                     try {
@@ -81,16 +74,16 @@ export class MeydaAnalyzer {
                     }
                 };
                 
-                // 设置渲染完成回调
+                //渲染完成回调
                 offlineCtx.oncomplete = async (e) => {
                     try {
                         console.log('特征提取完成，帧数:', frames.length);
                         
-                        // 计算统计特征
+                        //统计特征
                         const statistics = this.calculateStatistics(frames);
                         console.log('统计特征:', statistics);
                         
-                        // 计算平均特征
+                        //平均特征
                         const mfcc = this.averageMFCC(frames);
                         console.log('MFCC特征:', mfcc);
                         
@@ -134,11 +127,11 @@ export class MeydaAnalyzer {
                     }
                 };
                 
-                // 连接节点
+                //连接节点
                 sourceNode.connect(scriptNode);
                 scriptNode.connect(offlineCtx.destination);
                 
-                // 开始处理
+                //开始处理
                 meydaAnalyzer.start();
                 sourceNode.start(0);
                 offlineCtx.startRendering().catch(reject);
@@ -180,15 +173,15 @@ export class MeydaAnalyzer {
                 return;
             }
             
-            // 计算平均值
-            const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+           
+            const mean = values.reduce((sum, val) => sum + val, 0) / values.length; //计算平均值
             
-            // 计算标准差
+            //标准差
             const squaredDiffs = values.map(val => Math.pow(val - mean, 2));
             const variance = squaredDiffs.reduce((sum, val) => sum + val, 0) / values.length;
             const stdDev = Math.sqrt(variance);
             
-            // 计算变化率
+            //变化率
             let changes = 0;
             for (let i = 1; i < values.length; i++) {
                 if (Math.abs(values[i] - values[i-1]) > stdDev * 0.1) {

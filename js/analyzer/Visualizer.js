@@ -10,7 +10,7 @@ export class Visualizer {
     }
 
     setupCanvases() {
-        // 根据suffix获取对应的canvas
+        //根据suffix获取对应的canvas
         this.waveformCanvas = document.getElementById(`waveform${this.suffix}`);
         if (this.showSpectrogram) {
             this.spectrogramCanvas = document.getElementById(`spectrogram${this.suffix}`);
@@ -26,15 +26,15 @@ export class Visualizer {
     }
 
     resizeCanvas(canvas) {
-        // 获取容器的实际大小
+        //容器的实际大小
         const container = canvas.parentElement;
         const rect = container.getBoundingClientRect();
         
-        // 设置canvas的大小
+        //canvas的大小
         canvas.width = rect.width - 32; // 减去padding
         canvas.height = rect.height - 32;
         
-        // 清除画布
+        //清除画布
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = 'rgb(248, 246, 241)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -74,11 +74,11 @@ export class Visualizer {
         const width = this.waveformCanvas.width;
         const height = this.waveformCanvas.height;
         
-        // 清除画布
+        //清除画布
         this.waveformCtx.fillStyle = 'rgb(248, 246, 241)';
         this.waveformCtx.fillRect(0, 0, width, height);
         
-        // 设置波形样式
+        //波形样式
         this.waveformCtx.lineWidth = 2;
         this.waveformCtx.strokeStyle = 'rgb(51, 51, 51)';
         this.waveformCtx.beginPath();
@@ -86,7 +86,7 @@ export class Visualizer {
         const sliceWidth = width / dataArray.length;
         let x = 0;
         
-        // 绘制波形
+        //绘制波形
         dataArray.forEach((value, i) => {
             const y = (value * 0.5 * height/2) + height/2;
             if (i === 0) {
@@ -108,11 +108,11 @@ export class Visualizer {
         const width = this.spectrogramCanvas.width;
         const height = this.spectrogramCanvas.height;
         
-        // 清除画布
+        //清除画布
         this.spectrogramCtx.fillStyle = 'rgb(248, 246, 241)';
         this.spectrogramCtx.fillRect(0, 0, width, height);
         
-        // 绘制频谱
+        //绘制频谱
         const barWidth = (width / dataArray.length) * 2.5;
         let x = 0;
         

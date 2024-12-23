@@ -14,11 +14,11 @@ class VoiceprintCompareSystem {
         this.recordControllerB = new RecordControllerPlus(this.audioAnalyzerB, 'B');
         this.compareAnalyzer = new CompareAnalyzer();
         
-        // 创建两个可视化器
+        //可视化器
         this.visualizerA = new Visualizer(this.audioAnalyzerA, 'A');
         this.visualizerB = new Visualizer(this.audioAnalyzerB, 'B');
         
-        // 设置录音控制器的可视化器
+        //录音控制器的可视化器
         this.recordControllerA.setVisualizer(this.visualizerA);
         this.recordControllerB.setVisualizer(this.visualizerB);
         
@@ -29,11 +29,11 @@ class VoiceprintCompareSystem {
     }
 
     setupEventListeners() {
-        // 获取文件输入元素
+        //获取文件输入元素
         const fileInputA = document.getElementById('audioFileA');
         const fileInputB = document.getElementById('audioFileB');
         
-        // 添加文件上传监听器
+        //添加文件上传监听器
         if (fileInputA) {
             console.log('添加音频A文件上传监听器');
             fileInputA.addEventListener('change', (e) => {
@@ -54,7 +54,7 @@ class VoiceprintCompareSystem {
             console.error('未找到音频B文件输入元素');
         }
         
-        // 监听录音完成事件
+        //监听录音完成事件
         document.addEventListener('recordingComplete', (e) => {
             const { audioBuffer, suffix } = e.detail;
             if (suffix === 'A') {
@@ -70,17 +70,17 @@ class VoiceprintCompareSystem {
             setTimeout(() => this.compareAudio(), 500);
         });
 
-        // 对比按钮点击事件
+        //对比按钮点击事件
         if (this.compareBtn) {
             console.log('添加对比按钮点击监听器');
             this.compareBtn.addEventListener('click', () => {
                 const inputPanel = document.querySelector('.input-panel');
                 const resultPanel = document.querySelector('.result-panel');
                 
-                // 添加淡出动画类
+                //添加淡出动画类
                 inputPanel.style.animation = 'contentFade 0.3s ease-out reverse';
                 
-                // 等待淡出动画完成后切换面板
+                //等待淡出动画完成后切换面板
                 setTimeout(() => {
                     inputPanel.style.display = 'none';
                     resultPanel.style.display = 'block';
@@ -91,7 +91,7 @@ class VoiceprintCompareSystem {
             console.error('未找到对比按钮元素');
         }
 
-        // 返回按钮点击事件
+        //返回按钮点击事件
         const backBtn = document.getElementById('backBtn');
         if (backBtn) {
             console.log('添加返回按钮点击监听器');
@@ -99,14 +99,14 @@ class VoiceprintCompareSystem {
                 const inputPanel = document.querySelector('.input-panel');
                 const resultPanel = document.querySelector('.result-panel');
                 
-                // 添加淡出动画类
+                //添加淡出动画类
                 resultPanel.style.animation = 'contentFade 0.3s ease-out reverse';
                 
-                // 等待淡出动画完成后切换面板
+                //等待淡出动画完成后切换面板
                 setTimeout(() => {
                     resultPanel.style.display = 'none';
                     inputPanel.style.display = 'flex';
-                    // 重置动画
+                    //重置动画
                     inputPanel.style.animation = 'contentFade 0.4s ease-out';
                 }, 300);
             });
@@ -115,7 +115,7 @@ class VoiceprintCompareSystem {
         }
     }
 
-    // 检查是否可以启用对比按钮
+    //检查是否可以启用对比按钮
     checkEnableCompareButton() {
         const hasAudioA = !!this.audioControllerA.audioBuffer;
         const hasAudioB = !!this.audioControllerB.audioBuffer;
@@ -146,7 +146,7 @@ class VoiceprintCompareSystem {
                             this.audioControllerB.enablePlaybackControls();
                             this.audioControllerB.updateTotalTime(audioBuffer.duration);
                         }
-                        this.checkEnableCompareButton();  // 检查是否可以启用对比按钮
+                        this.checkEnableCompareButton();  //检查是否可以启用对比按钮
                         if (this.audioControllerA.audioBuffer && this.audioControllerB.audioBuffer) {
                             setTimeout(() => this.compareAudio(), 500);
                         }
@@ -212,11 +212,11 @@ class VoiceprintCompareSystem {
             console.log('开始更新结果显示');
             console.log('结果数据:', JSON.stringify(results, null, 2));
             
-            // 更新总体相似度
+            //总体相似度
             document.getElementById('totalSimilarity').textContent = 
                 `${Math.round(results.totalSimilarity * 100)}%`;
             
-            // 更新三个主要相似度指标
+            //三个主要相似度指标
             document.getElementById('timbreSimilarity').textContent = 
                 `${Math.round(results.timbreSimilarity * 100)}%`;
             document.getElementById('acousticSimilarity').textContent = 
@@ -224,7 +224,7 @@ class VoiceprintCompareSystem {
             document.getElementById('rhythmSimilarity').textContent = 
                 `${Math.round(results.rhythmSimilarity * 100)}%`;
             
-            // 更新节奏特征的详细指标
+            //节奏特征的详细指标
             if (results.rhythmFeatures) {
                 document.getElementById('speedMatch').textContent = 
                     `${Math.round(results.rhythmFeatures.speedMatch * 100)}%`;
@@ -234,13 +234,13 @@ class VoiceprintCompareSystem {
                     `${Math.round(results.rhythmFeatures.durationRatio * 100)}%`;
             }
 
-            // 更新详细特征匹配度
+            //详细特征匹配度
             const details = results.details || {};
             const timbreFeatures = details.timbreFeatures || {};
             
             console.log('音色特征:', timbreFeatures);
             
-            // 音色特征对比
+            //音色特征对比
             document.getElementById('harmonicsMatch').textContent = 
                 `${Math.round((timbreFeatures.harmonicsMatch || 0) * 100)}%`;
             document.getElementById('spectralMatch').textContent = 
@@ -248,7 +248,7 @@ class VoiceprintCompareSystem {
             document.getElementById('timbreMatch').textContent = 
                 `${Math.round((timbreFeatures.timbreFeatureMatch || 0) * 100)}%`;
             
-            // 声学特征对比
+            //声学特征对比
             document.getElementById('pitchRangeMatch').textContent = 
                 `${Math.round((details.pitchRangeMatch || 0) * 100)}%`;
             document.getElementById('energyMatch').textContent = 
@@ -256,7 +256,7 @@ class VoiceprintCompareSystem {
             document.getElementById('formantMatch').textContent = 
                 `${Math.round((details.formantMatch || 0) * 100)}%`;
 
-            // 生成分析结论
+            //分析结论
             const totalSimilarity = Math.round(results.totalSimilarity * 100);
             const timbreSimilarity = Math.round(results.timbreSimilarity * 100);
             const acousticSimilarity = Math.round(results.acousticSimilarity * 100);
@@ -269,7 +269,7 @@ class VoiceprintCompareSystem {
             conclusionText += `声学特征相似度为 <span class="highlight">${acousticSimilarity}%</span>，`;
             conclusionText += `节奏特征相似度为 <span class="highlight">${rhythmSimilarity}%</span>。</div>\n\n`;
             
-            // 添加相似度评估结论
+            //相似度评估结论
             conclusionText += '<div class="section">相似度评估：\n';
             if (totalSimilarity >= 90) {
                 conclusionText += '两段语音极其相似，可以认为是同一个说话人。';
@@ -283,8 +283,8 @@ class VoiceprintCompareSystem {
                 conclusionText += '两段语音差异较大，可能不是同一个说话人。';
             }
             conclusionText += '</div>';
-
-            // 更新结论文本
+        
+            //结论文本
             const conclusionElement = document.getElementById('conclusionText');
             conclusionElement.innerHTML = conclusionText;
             
@@ -293,7 +293,7 @@ class VoiceprintCompareSystem {
         }
     }
 
-    getSimilarityLevel(score) {
+    getSimilarityLevel(score) { //相似度等级
         if (score >= 90) return '属于极高相似';
         if (score >= 80) return '属于高度相似';
         if (score >= 60) return '属于中等相似';
@@ -301,14 +301,13 @@ class VoiceprintCompareSystem {
         return '差异显著';
     }
 
-    startVisualization() {
-        // 启动波形可视化
+    startVisualization() { //启动波形可视化
         this.visualizerA.start();
         this.visualizerB.start();
     }
 }
 
-// 初始化��用
+//初始化应用
 window.addEventListener('load', () => {
     new VoiceprintCompareSystem();
 }); 

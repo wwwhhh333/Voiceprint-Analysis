@@ -30,7 +30,6 @@ export class AudioController {
         this.progressBar.addEventListener('input', () => this.seekAudio());
         this.progressBar.addEventListener('change', () => this.seekAudio());
         
-        // 只在主页面添加文件上传监听
         if (!this.suffix && this.audioFileInput) {
             this.audioFileInput.addEventListener('change', (e) => this.handleFileUpload(e));
         }
@@ -112,7 +111,7 @@ export class AudioController {
             this.audioSource = this.audioContext.createBufferSource();
             this.audioSource.buffer = this.audioBuffer;
             
-            // 连接到分析器和输出
+            //连接到分析器和输出
             this.audioSource.connect(this.audioAnalyzer.analyser);
             this.audioSource.connect(this.audioAnalyzer.waveAnalyser);
             this.audioSource.connect(this.audioContext.destination);

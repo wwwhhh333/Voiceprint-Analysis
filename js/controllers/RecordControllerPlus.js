@@ -47,14 +47,13 @@ export class RecordControllerPlus {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             
-            // 创建MediaRecorder
-            this.mediaRecorder = new MediaRecorder(stream);
+            this.mediaRecorder = new MediaRecorder(stream); //创建MediaRecorder
             
-            // 创建音频源并连接到分析器
+            //创建音频源并连接到分析器
             const source = this.audioContext.createMediaStreamSource(stream);
             this.audioAnalyzer.connectSource(source);
             
-            // 设置录音数据处理
+            //设置录音数据处理
             this.recordedChunks = [];
             this.mediaRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
@@ -62,15 +61,15 @@ export class RecordControllerPlus {
                 }
             };
 
-            // 开始录音
+            //开始录音
             this.mediaRecorder.start();
             this.isRecording = true;
             
-            // 更新UI
+            //更新UI
             this.recordButton.textContent = '停止录音';
             this.recordButton.classList.add('recording');
             
-            // 开始波形可视化
+            //开始波形可视化
             this.startVisualization();
             
         } catch (err) {
@@ -99,7 +98,7 @@ export class RecordControllerPlus {
                 
                 blob.arrayBuffer().then(buffer => {
                     console.log('录音完成，开始解码...');
-                    // 直接解码音频数据
+                    //直接解码音频数据
                     this.audioContext.decodeAudioData(buffer, 
                         (audioBuffer) => {
                             console.log('录音解码成功，触发完成事件');

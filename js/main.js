@@ -14,13 +14,12 @@ class VoiceprintAnalysisSystem {
         this.audioController = new AudioController(this.audioAnalyzer);
         this.recordController = new RecordController(this.audioAnalyzer);
         
-        // 设置录音控制器的可视化器
-        this.recordController.setVisualizer(this.visualizer);
+        this.recordController.setVisualizer(this.visualizer); //设置录音控制器的可视化器
         
-        // 监听录音完成事件
+        //监听录音完成事件
         document.addEventListener('recordingComplete', (e) => {
             const { audioBuffer } = e.detail;
-            // 直接设置解码后的音频数据
+
             this.audioController.setAudioBuffer(audioBuffer);
             this.audioController.enablePlaybackControls();
             this.audioController.updateTotalTime(audioBuffer.duration);
@@ -46,35 +45,26 @@ class VoiceprintAnalysisSystem {
     }
 }
 
-// 初始化应用
+//初始化应用
 window.addEventListener('load', () => {
     new VoiceprintAnalysisSystem();
 });
 
-// 在页面加载完成后执行
+//在页面加载完成后执行
 document.addEventListener('DOMContentLoaded', () => {
-    // 获取所有导航链接
+    //获取所有导航链接
     const navLinks = document.querySelectorAll('.nav-item');
     
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
-            // 如果不是当前激活的链接
-            if (!link.classList.contains('active')) {
+            if (!link.classList.contains('active')) { //如果不是当前激活的链接
                 e.preventDefault();
-                
-                // 移除其他链接的激活状态
                 navLinks.forEach(l => l.classList.remove('active'));
-                
-                // 添加当前链接的激活状态
                 link.classList.add('active');
-                
-                // 获取目标页面URL
                 const targetUrl = link.getAttribute('href');
+                document.querySelector('.body-contianer').style.animation = 'slideOut 0.3s ease-out'; //退出动画
                 
-                // 添加退出动画
-                document.querySelector('.body-contianer').style.animation = 'slideOut 0.3s ease-out';
-                
-                // 等待动画完成后跳转
+                //动画完成后跳转
                 setTimeout(() => {
                     window.location.href = targetUrl;
                 }, 300);
@@ -83,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// 添加退出动画的关键帧
+//退出动画的关键帧
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideOut {

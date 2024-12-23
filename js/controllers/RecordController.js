@@ -93,7 +93,7 @@ export class RecordController {
                 this.recordedChunks = [];
                 
                 blob.arrayBuffer().then(buffer => {
-                    // 直接解码音频数据
+                    //直接解码音频数据
                     this.audioContext.decodeAudioData(buffer, 
                         (audioBuffer) => {
                             const event = new CustomEvent('recordingComplete', {
