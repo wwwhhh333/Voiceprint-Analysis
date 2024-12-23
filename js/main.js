@@ -1,10 +1,12 @@
-//主文件，负责初始化应用
+//获取当前脚本的基础路径
+const baseUrl = new URL(import.meta.url).pathname.split('/js/')[0];
 
-import { AudioAnalyzer } from './analyzer/AudioAnalyzer.js';
-import { AudioController } from './controllers/AudioController.js';
-import { FeatureAnalyzer } from './analyzer/FeatureAnalyzer.js';
-import { Visualizer } from './analyzer/Visualizer.js';
-import { RecordController } from './controllers/RecordController.js';
+//主文件，负责初始化应用
+import { AudioAnalyzer } from `${baseUrl}/js/analyzer/AudioAnalyzer.js`;
+import { AudioController } from `${baseUrl}/js/controllers/AudioController.js`;
+import { FeatureAnalyzer } from `${baseUrl}/js/analyzer/FeatureAnalyzer.js`;
+import { Visualizer } from `${baseUrl}/js/analyzer/Visualizer.js`;
+import { RecordController } from `${baseUrl}/js/controllers/RecordController.js`;
 
 class VoiceprintAnalysisSystem {
     constructor() {

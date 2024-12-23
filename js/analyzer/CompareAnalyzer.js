@@ -70,8 +70,6 @@ export class CompareAnalyzer {
                 throw new Error('特征提取失败');
             }
             
-            const similarity = this.meydaAnalyzer.compareFeatures(featuresA, featuresB); //计算特征相似度
-            
             //计算统计特征差异
             const statsDiff = this.calculateStatsDifference(
                 featuresA.statistics,
@@ -85,11 +83,12 @@ export class CompareAnalyzer {
             const rhythmSimilarity = (speedMatch * 0.4 + rhythmMatch * 0.4 + durationRatio * 0.2); 
 
             //2、音色相似度
+            const similarity = this.meydaAnalyzer.compareFeatures(featuresA, featuresB); //计算特征相似度
             const timbreSimilarity = this.normalizeValue(similarity.spectral); 
 
             //3、声学特征相似度
             const pitchMatch = this.calculatePitchMatch(featuresA, featuresB); //音高相似度
-            const acousticSimilarity = this.normalizeValue( 
+            const acousticSimilarity = this.normalizeValue(
                 (similarity.mfcc * 0.4 + similarity.spectral * 0.3 + pitchMatch * 0.3)
             ); 
 

@@ -283,28 +283,28 @@ export class MeydaAnalyzer {
         console.log('特征A:', featuresA);
         console.log('特征B:', featuresB);
         
-        // 计算MFCC相似度
+        //MFCC相似度
         const mfccSimilarity = this.calculateMFCCSimilarity(
             featuresA.mfcc,
             featuresB.mfcc
         );
         console.log('MFCC相似度:', mfccSimilarity);
         
-        // 计算频谱特征相似度
+        //频谱特征相似度
         const spectralSimilarity = this.calculateSpectralSimilarity(
             featuresA,
             featuresB
         );
         console.log('频谱相似度:', spectralSimilarity);
         
-        // 计算时域特征相似度
+        //时域特征相似度
         const temporalSimilarity = this.calculateTemporalSimilarity(
             featuresA,
             featuresB
         );
         console.log('时域相似度:', temporalSimilarity);
         
-        // 计算总体相似度
+        //总体相似度
         const overall = (mfccSimilarity + spectralSimilarity + temporalSimilarity) / 3;
         console.log('总体相似度:', overall);
         
