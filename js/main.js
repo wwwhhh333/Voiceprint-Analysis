@@ -10,7 +10,8 @@ class VoiceprintAnalysisSystem {
             
             try {
                 //动态导入所需模块
-                const baseUrl = window.location.pathname.replace(/\/[^\/]*$/, '');
+                const baseUrl = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
+                const moduleBaseUrl = baseUrl.replace(/\/[^\/]*\/$/, '');
                 const [
                     { AudioAnalyzer },
                     { AudioController },
@@ -18,11 +19,11 @@ class VoiceprintAnalysisSystem {
                     { Visualizer },
                     { RecordController }
                 ] = await Promise.all([
-                    import(baseUrl + '/js/analyzer/AudioAnalyzer.js'),
-                    import(baseUrl + '/js/controllers/AudioController.js'),
-                    import(baseUrl + '/js/analyzer/FeatureAnalyzer.js'),
-                    import(baseUrl + '/js/analyzer/Visualizer.js'),
-                    import(baseUrl + '/js/controllers/RecordController.js')
+                    import(moduleBaseUrl + '/js/analyzer/AudioAnalyzer.js'),
+                    import(moduleBaseUrl + '/js/controllers/AudioController.js'),
+                    import(moduleBaseUrl + '/js/analyzer/FeatureAnalyzer.js'),
+                    import(moduleBaseUrl + '/js/analyzer/Visualizer.js'),
+                    import(moduleBaseUrl + '/js/controllers/RecordController.js')
                 ]);
 
                 //初始化组件
