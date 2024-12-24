@@ -1,4 +1,5 @@
 /* 1. 控制区域布局 */
+
 .controls {
     display: flex;
     align-items: center;
@@ -7,12 +8,14 @@
     padding: 0 20px;
 }
 
+/* 输入控制 */
 .input-controls {
     display: flex;
     gap: 25px;
     margin-right: auto;
 }
 
+/* 播放控制 */
 .playback-controls {
     display: flex;
     align-items: center;
@@ -20,7 +23,8 @@
     margin-left: auto;
 }
 
-/* 2. 按钮基础样式 */
+/* 2. 按钮样式 */
+
 #recordBtn, .upload-btn, #playPauseBtn, 
 #recordBtnA, #recordBtnB, 
 #playPauseBtnA, #playPauseBtnB,
@@ -43,7 +47,7 @@
     overflow: hidden;
 }
 
-/* 3. 上传按钮特殊样式 */
+/* 上传按钮 */
 .upload-btn {
     position: relative;
     overflow: hidden;
@@ -69,7 +73,6 @@
     font-size: 0;
 }
 
-/* 4. 按钮状态样式 */
 /* 悬停效果 */
 #recordBtn:hover, .upload-btn:hover, #playPauseBtn:hover,
 #recordBtnA:hover, #recordBtnB:hover,
@@ -102,13 +105,16 @@
     box-shadow: none;
 }
 
-/* 5. 进度条控制 */
+/* 3. 进度条控制 */
+
+/* 进度容器 */
 .progress-container {
     display: flex;
     align-items: center;
     min-width: 400px;
 }
 
+/* 滑块样式 */
 input[type="range"] {
     flex: 1;
     min-width: 300px;
@@ -116,6 +122,7 @@ input[type="range"] {
     height: 5px;
 }
 
+/* 时间 */
 .time-display {
     white-space: nowrap;
     min-width: 100px;
@@ -124,7 +131,8 @@ input[type="range"] {
     font-size: 16px;
 }
 
-/* 6. 状态文本 */
+/* 4. 状态显示 */
+
 .status-text {
     margin: 0 20px 0 auto;
     color: var(--text-color);
@@ -133,7 +141,8 @@ input[type="range"] {
     opacity: 0.8;
 }
 
-/* 7. 音频控制组件 */
+/* 5. 音频控制 */
+
 .audio-controls {
     margin-bottom: 2rem;
 }
@@ -164,7 +173,7 @@ input[type="range"] {
     margin-bottom: 1rem;
 }
 
-/* 8. 特殊按钮样式 */
+/* 特殊按钮 */
 .record-button,
 .upload-button {
     flex: 1;
@@ -200,7 +209,7 @@ input[type="range"] {
     background-color: var(--surface-color-dark);
 }
 
-/* 9. 音频播放器 */
+/* 音频播放器 */
 .audio-player {
     width: 100%;
 }
@@ -210,12 +219,8 @@ input[type="range"] {
     margin-top: 1rem;
 }
 
-/* 10. 对比控制 */
-.compare-controls {
-    text-align: center;
-}
+/* 6. 动画效果 */
 
-/* 11. 动画效果 */
 @keyframes ripple {
     to {
         transform: scale(4);
@@ -235,7 +240,101 @@ input[type="range"] {
     pointer-events: none;
 }
 
-/* 12. 页面特定样式 */
+/* 7. 页面特定样式 */
+
+/* 页面布局 */
 .body-contianer > .controls > #recordBtn {
     margin-right: 20px;
+}
+
+/* 7.2 对比控制 */
+.compare-controls {
+    text-align: center;
+}
+
+/* 响应式布局 */
+
+/* 大屏幕 */
+@media screen and (max-width: 1024px) {
+    .controls {
+        padding: 0 15px;
+    }
+
+    .playback-controls {
+        min-width: 250px;
+    }
+
+    #recordBtn, .upload-btn, #playPauseBtn {
+        height: 36px;
+        min-width: 120px;
+        font-size: 20px;
+    }
+}
+
+/* 平板 */
+@media screen and (max-width: 768px) {
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 20px;
+        padding: 0 10px;
+    }
+
+    .input-controls {
+        justify-content: center;
+        margin-right: 0;
+    }
+
+    .playback-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .progress-container {
+        flex-direction: column;
+        align-items: stretch;
+        min-width: 0;
+    }
+
+    input[type="range"] {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .time-display {
+        text-align: center;
+        margin-top: 5px;
+    }
+
+    #recordBtn, .upload-btn, #playPauseBtn {
+        height: 34px;
+        min-width: 110px;
+        font-size: 18px;
+    }
+}
+
+/* 手机 */
+@media screen and (max-width: 480px) {
+    .controls {
+        gap: 15px;
+        padding: 0 5px;
+    }
+
+    .input-controls {
+        gap: 10px;
+    }
+
+    #recordBtn, .upload-btn, #playPauseBtn {
+        height: 32px;
+        min-width: 100px;
+        font-size: 16px;
+    }
+
+    .status-text {
+        font-size: 14px;
+        text-align: center;
+        margin: 0;
+        padding: 5px 0;
+    }
 }

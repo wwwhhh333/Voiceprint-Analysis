@@ -1,4 +1,6 @@
-/* 1. 变量定义 */
+/* 1. 基础样式 */
+
+/* 变量 */
 :root {
     --border-color: #B2B2B2AD;
     --text-color: #5B5B5BA6;
@@ -9,7 +11,7 @@
     --transition-time: 0.3s;
 }
 
-/* 2. 基础样式 */
+/* 基础样式 */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: #FAFAFA;
@@ -25,7 +27,9 @@ body {
     animation: fadeIn 0.5s ease;
 }
 
-/* 3. 标题样式 */
+/* 2. 布局组件 */
+
+/* 标题样式 */
 h1 {
     text-align: center;
     margin-bottom: 60px;
@@ -35,7 +39,7 @@ h1 {
     letter-spacing: 0.5px;
 }
 
-/* 4. 导航栏 */
+/* 导航栏 */
 .nav-bar {
     margin: 0;
     position: relative;
@@ -76,7 +80,7 @@ h1 {
     transform: translateY(-2px);
 }
 
-/* 5. 主体容器 */
+/* 主体容器 */
 .body-contianer {
     margin: 20px 10px;
     border: 3px solid var(--border-color);
@@ -92,7 +96,8 @@ h1 {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
-/* 6. 滚动条样式 */
+/* 3. 滚动条 */
+
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -113,7 +118,9 @@ h1 {
     background: var(--button-hover-color);
 }
 
-/* 7. 动画效果 */
+/* 4. 动画效果 */
+
+/* 关键帧 */
 @keyframes slideIn {
     from {
         opacity: 0;
@@ -180,7 +187,7 @@ h1 {
     }
 }
 
-/* 8. 动画应用 */
+/* 动画应用 */
 .visualization,
 .compare-container,
 .audio-panel,
@@ -200,7 +207,7 @@ h1 {
     animation-fill-mode: backwards;
 }
 
-/* 9. 动画延迟 */
+/* 延迟 */
 .data-item:nth-child(1) { animation-delay: 0.1s; }
 .data-item:nth-child(2) { animation-delay: 0.2s; }
 .data-item:nth-child(3) { animation-delay: 0.3s; }

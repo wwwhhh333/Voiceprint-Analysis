@@ -1,11 +1,16 @@
 /* 1. 基础布局 */
+
+/* 容器布局 */
 .container {
     margin-top: 40px;
 }
 
 /* 2. 可视化区域 */
+
+/* 可视化容器 */
 .visualization {
     display: flex;
+    flex-wrap: wrap;
     gap: 30px;
     margin-top: 20px;
 }
@@ -15,8 +20,17 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: visible;
+    z-index: 1;
 }
 
+.visual-container:hover {
+    z-index: 2;
+}
+
+/* 画布 */
 canvas {
     width: 100%;
     height: 200px;
@@ -30,7 +44,23 @@ canvas:hover {
     border-color: var(--button-hover-color);
 }
 
+/* 标题 */
+.visual-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.visual-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
 /* 3. 数据显示区域 */
+
+/* 分析数据容器 */
 .analysis-data {
     margin-top: 20px;
     padding: 20px;
@@ -40,15 +70,24 @@ canvas:hover {
     flex: 1;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
+    width: 100%;
+    overflow: visible;
 }
 
+/* 数据网格 */
 .data-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
     flex: 1;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: visible;
+    z-index: 1;
 }
 
+/* 数据项 */
 .data-item {
     border: 2px solid var(--border-color);
     border-radius: var(--border-radius);
@@ -60,11 +99,18 @@ canvas:hover {
     gap: 5px;
     justify-content: center;
     min-height: 50px;
+    box-sizing: border-box;
+    padding: 10px;
+    word-wrap: break-word;
+    overflow: visible;
+    position: relative;
+    z-index: 1;
 }
 
 .data-item:hover {
     border-color: var(--button-hover-color);
     transform: translateY(-2px);
+    z-index: 2;
 }
 
 .data-item span:first-child {
@@ -85,7 +131,7 @@ canvas:hover {
     margin: 5px;
 }
 
-/* 4. 标题样式 */
+/* 4. 标题 */
 h2, h3, h4 {
     color: var(--text-color);
     font-weight: 400;
@@ -108,7 +154,289 @@ h4 {
     margin: 10px 0;
 }
 
-/* 5. 对比页面布局 */
+/* 5. 提示框 */
+
+.tooltip {
+    position: relative;
+    cursor: help;
+    display: inline-block;
+    overflow: visible;
+    z-index: 1;
+}
+
+.tooltip .tooltip-text {
+    visibility: hidden;
+    width: 300px;
+    background-color: var(--button-color);
+    color: var(--text-color);
+    text-align: left;
+    border-radius: 6px;
+    padding: 12px;
+    position: absolute;
+    z-index: 9999;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 14px;
+    line-height: 1.5;
+    box-shadow: 0 2px 8px #9fa5b5;
+    pointer-events: none;
+}
+
+.tooltip .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--button-color) transparent transparent transparent;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+.tooltip .value {
+    color: #ea0000;
+    font-weight: 500;
+}
+
+.visual-header .tooltip {
+    display: inline-flex;
+    align-items: center;
+    overflow: visible;
+    z-index: 2;
+}
+
+.visual-header .tooltip .tooltip-text {
+    bottom: auto;
+    top: -10px;
+    transform: translateY(-100%);
+    left: 20px;
+    z-index: 9999;
+}
+
+.data-item .tooltip {
+    width: 100%;
+    display: inline-block;
+    overflow: visible;
+    z-index: 2;
+}
+
+.data-item .tooltip .tooltip-text {
+    width: 280px;
+    left: 50%;
+    bottom: 120%;
+    transform: translateX(-50%);
+    z-index: 9999;
+}
+
+/* 6. 响应式布局 */
+
+/* 大屏幕 (1400px以下) */
+@media screen and (max-width: 1400px) {
+    .visualization {
+        gap: 20px;
+    }
+
+    .visual-container {
+        flex-basis: calc(50% - 10px);
+        min-width: 280px;
+    }
+
+    .data-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+
+    canvas {
+        height: 180px;
+    }
+}
+
+/* 中等屏幕 (1024px以下) */
+@media screen and (max-width: 1024px) {
+    .visualization {
+        gap: 15px;
+    }
+
+    .visual-container {
+        flex-basis: 100%;
+    }
+
+    .data-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .data-item {
+        min-height: 45px;
+        padding: 5px;
+    }
+
+    .data-item span:first-child {
+        font-size: 14px;
+        padding: 0 5px;
+    }
+
+    .data-item span:last-child {
+        font-size: 16px;
+        padding: 0 5px;
+    }
+
+    .data-item .feature-detail {
+        font-size: 11px;
+        margin: 3px;
+        padding: 0 5px;
+    }
+
+    canvas {
+        height: 160px;
+    }
+
+    .analysis-data {
+        padding: 15px;
+    }
+}
+
+/* 平板 (768px以下) */
+@media screen and (max-width: 768px) {
+    .visualization {
+        gap: 15px;
+    }
+
+    .visual-container {
+        min-width: 100%;
+    }
+
+    .data-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    canvas {
+        height: 140px;
+    }
+
+    h3 {
+        font-size: 18px;
+    }
+
+    h4 {
+        font-size: 16px;
+    }
+
+    .data-item {
+        padding: 8px 5px;
+    }
+
+    .tooltip .tooltip-text {
+        width: 250px;
+    }
+    
+    .data-item .tooltip .tooltip-text {
+        width: 220px;
+    }
+}
+
+/* 手机 (480px以下) */
+@media screen and (max-width: 480px) {
+    .visualization {
+        gap: 10px;
+    }
+
+    .visual-container {
+        margin-bottom: 15px;
+    }
+
+    .data-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .data-item {
+        min-height: 40px;
+        padding: 5px;
+    }
+
+    .data-item span:first-child {
+        font-size: 13px;
+        padding: 0 3px;
+    }
+
+    .data-item span:last-child {
+        font-size: 15px;
+        padding: 0 3px;
+    }
+
+    .data-item .feature-detail {
+        font-size: 10px;
+        margin: 2px;
+        padding: 0 3px;
+    }
+
+    canvas {
+        height: 120px;
+    }
+
+    .analysis-data {
+        padding: 10px;
+        margin-top: 15px;
+    }
+
+    h3 {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    h4 {
+        font-size: 14px;
+        margin: 8px 0;
+    }
+
+    .tooltip .tooltip-text {
+        width: 200px;
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .data-item .tooltip .tooltip-text {
+        width: 180px;
+    }
+}
+
+/* 层级 */
+.visual-container,
+.data-grid,
+.visual-header {
+    overflow: visible;
+    position: relative;
+}
+
+.visual-container {
+    z-index: 1;
+}
+
+.visual-container:hover {
+    z-index: 2;
+}
+
+.data-grid {
+    z-index: 1;
+}
+
+.visual-header {
+    z-index: 2;
+}
+
+/* 7. 对比功能 */
+
+/* 对比容器 */
 .compare-container {
     margin: 20px 0 0 0;
     border: 3px solid var(--border-color);
@@ -120,7 +448,7 @@ h4 {
     transition: box-shadow var(--transition-time) ease;
 }
 
-/* 6. 音频面板 */
+/* 音频面板 */
 .input-panel {
     width: 100%;
     display: flex;
@@ -144,6 +472,7 @@ h4 {
     box-sizing: border-box;
 }
 
+/* 音频控制 */
 .audio-panel .controls {
     display: flex;
     flex-direction: column;
@@ -183,7 +512,7 @@ h4 {
     font-size: 14px;
 }
 
-/* 7. 按钮样式 */
+/* 对比按钮 */
 .compare-action {
     display: flex;
     justify-content: center;
@@ -228,7 +557,9 @@ h4 {
     transform: none;
 }
 
-/* 8. 结果面板 */
+/* 8. 结果显示 */
+
+/* 结果面板 */
 .result-panel {
     width: 100%;
 }
@@ -256,7 +587,7 @@ h4 {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* 9. 相似度显示 */
+/* 相似度显示 */
 .overall-similarity {
     text-align: center;
 }
@@ -283,7 +614,9 @@ h4 {
     gap: 2rem;
 }
 
-/* 10. 特征对比 */
+/* 9. 特征对比 */
+
+/* 对比布局 */
 .features-comparison {
     display: flex;
     gap: 30px;
@@ -306,7 +639,9 @@ h4 {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* 分析结论样式 */
+/* 10. 分析结论 */
+
+/* 结论样式 */
 .conclusion {
     background-color: white;
     border: 2px solid var(--border-color);
@@ -353,54 +688,7 @@ h4 {
     background-color: var(--button-hover-color);
 }
 
-/* 11. Tooltip */
-.tooltip {
-    position: relative;
-    cursor: help;
-}
-
-.tooltip .tooltip-text {
-    visibility: hidden;
-    width: 300px;
-    background-color: var(--button-color);
-    color: var(--text-color);
-    text-align: left;
-    border-radius: 6px;
-    padding: 12px;
-    position: absolute;
-    z-index: 1000;
-    bottom: 125%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-    font-size: 14px;
-    line-height: 1.5;
-    box-shadow: 0 2px 8px #9fa5b5;
-}
-
-.tooltip .tooltip-text::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: rgba(51, 51, 51, 0.95) transparent transparent transparent;
-}
-
-.tooltip:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-}
-
-.tooltip .value {
-    color: #ea0000;
-    font-weight: 500;
-}
-
-/* 12. 响应式设计 */
+/* 11.2 对比页面响应式 */
 @media (max-width: 1200px) {
     .input-panel {
         flex-direction: column;
@@ -430,10 +718,6 @@ h4 {
         gap: 1rem;
     }
     
-    .tooltip .tooltip-text {
-        width: 250px;
-    }
-    
     .score-value {
         font-size: 2.5rem;
     }
@@ -443,23 +727,7 @@ h4 {
     }
 }
 
-/* 13. 动画效果 */
-@keyframes pageEnter {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.input-panel, .result-panel {
-    transition: all 0.3s ease;
-}
-
-/* 14. 高对比度模式支持 */
+/* 高对比度支持 */
 @media (forced-colors: active) {
     .stats-item {
         forced-color-adjust: none;
@@ -476,61 +744,5 @@ h4 {
     .feature-detail {
         color: ButtonText;
     }
-}
-
-.visual-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.visual-header h3 {
-    margin: 0;
-    display: flex;
-    align-items: center;
-}
-
-.visual-header .tooltip {
-    cursor: help;
-}
-
-.visual-header .tooltip .tooltip-text {
-    width: 280px;
-    left: 0;
-    transform: translateX(0) translateY(-100%);
-    bottom: auto;
-    top: -10px;
-}
-
-.visual-header .tooltip .tooltip-text::after {
-    top: 100%;
-    left: 20px;
-    transform: none;
-}
-
-.view-controls {
-    display: flex;
-    gap: 10px;
-}
-
-.view-toggle-btn {
-    padding: 5px 10px;
-    background-color: var(--surface-color-light);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.view-toggle-btn:hover {
-    background-color: var(--surface-color-dark);
-}
-
-.view-toggle-btn.active {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
 }
 

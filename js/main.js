@@ -10,8 +10,6 @@ class VoiceprintAnalysisSystem {
             
             try {
                 //动态导入所需模块
-                const baseUrl = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
-                const moduleBaseUrl = baseUrl.replace(/\/[^\/]*\/$/, '');
                 const [
                     { AudioAnalyzer },
                     { AudioController },
@@ -19,11 +17,26 @@ class VoiceprintAnalysisSystem {
                     { Visualizer },
                     { RecordController }
                 ] = await Promise.all([
-                    import(moduleBaseUrl + '/js/analyzer/AudioAnalyzer.js'),
-                    import(moduleBaseUrl + '/js/controllers/AudioController.js'),
-                    import(moduleBaseUrl + '/js/analyzer/FeatureAnalyzer.js'),
-                    import(moduleBaseUrl + '/js/analyzer/Visualizer.js'),
-                    import(moduleBaseUrl + '/js/controllers/RecordController.js')
+                    import('./analyzer/AudioAnalyzer.js').catch(e => {
+                        console.error('加载AudioAnalyzer模块失败:', e);
+                        throw new Error('加载AudioAnalyzer模块失败');
+                    }),
+                    import('./controllers/AudioController.js').catch(e => {
+                        console.error('加载AudioController模块失败:', e);
+                        throw new Error('加载AudioController模块失败');
+                    }),
+                    import('./analyzer/FeatureAnalyzer.js').catch(e => {
+                        console.error('加载FeatureAnalyzer模块失败:', e);
+                        throw new Error('加载FeatureAnalyzer模块失败');
+                    }),
+                    import('./analyzer/Visualizer.js').catch(e => {
+                        console.error('加载Visualizer模块失败:', e);
+                        throw new Error('加载Visualizer模块失败');
+                    }),
+                    import('./controllers/RecordController.js').catch(e => {
+                        console.error('加载RecordController模块失败:', e);
+                        throw new Error('加载RecordController模块失败');
+                    })
                 ]);
 
                 //初始化组件
@@ -52,7 +65,7 @@ class VoiceprintAnalysisSystem {
                 console.error('初始化失败:', error);
                 const statusText = document.getElementById('statusText');
                 if (statusText) {
-                    statusText.textContent = '初始化失败，请刷新页面重试';
+                    statusText.textContent = '初始化失败: ' + error.message;
                 }
             }
         };
